@@ -345,9 +345,8 @@ foreach($stu as $k=>$v){
 
 #### 1.3.1  语法
 
-break：中断循环
-
-continue：中断当前循环，进入下一个循环
+1. break：中断循环
+2. continue：中断当前循环，进入下一个循环
 
 例题：
 
@@ -387,6 +386,7 @@ for($i=1; $i<=10; $i++) {
 
 break和continue默认中断、跳出1重循环，如果调中断、跳出多重循环，在后面加一个数字。
 
+默认是`break 1`
 ```php
 <?php
 for($i=1; $i<=10; $i++) {
@@ -424,7 +424,7 @@ for($i=1; $i<=10; $i++) {
 4
 ```
 
-小结：switch的本质是循环了一次的循环
+小结：switch的源码本质是循环了一次的循环
 
 
 
@@ -461,7 +461,9 @@ php中除了do-while以外，其他的语法结构都有替代语法
     endforeach;
 ```
 
-例题：在混编的时候用替代语法
+例题：替代语法主要在混编的时候用替代语法
+
+混编就是php界定符重复使用时
 
 ```php+HTML
 <body>
@@ -484,6 +486,8 @@ endfor;
 ```
 
 小结：可以通过替代语法证明else if之间如果有空格是嵌套if语句。
+
+- elseif之间没有空格，如果有空格就是嵌套if语句
 
 ```php
 <?php
@@ -549,7 +553,8 @@ SHOW();		//锄禾日当午  函数名不区分大小写
 
 #### 1.5.2  可变函数
 
-将函数名存储到变量中
+将函数名存储到变量中，
+- 注意：它赋值的是字符串
 
 ```php
 <?php
@@ -675,12 +680,12 @@ fun('berry');
 
 
 
-2、默认值必须是值，不能用变量代替
+2、默认值必须是值，不能用变量代替。js中可以
 
 ```php
 <?php
 $str='地址不详'
-function fun($name,$add=$str) {   //错误，默认值可以使用变量
+function fun($name,$add=$str) {   //错误，默认值不可以使用变量
 	echo '姓名：'.$name,'<br>';
 	echo '地址：'.$add,'<hr>';
 }
@@ -739,8 +744,8 @@ fun(10,20,30); //实参多于形参，只取前面对应的值
 ```php
 <?php
 function fun() {
-	//echo func_num_args(),'<br>';	//获取参数的个数
-	$args=func_get_args();	//获取参数数组
+	//echo func_num_args(),'<br>';	//只能获取参数的个数，内置全局获参函数
+	$args=func_get_args();	// 获取参数数组，内置全局函数
 	print_r($args);
 }
 fun(10);
@@ -823,7 +828,7 @@ echo fun(10,20);		//30
 function fun():array {
 }
 //约束return后面不能有返回值  必须在7.1以后的版本中才支持
-function fun():void {    //void是空的意思
+function fun():void {    //void是空的意思，不能返回任何值
 	return;
 }
 fun();
@@ -842,7 +847,7 @@ return;			//终止脚本执行
 echo '汗滴禾下土<br>';	//不执行
 ```
 
-提醒：return只能中断当前页面，如果有包含文件，只能中断包含文件
+提醒：return只能中断当前文件页面，如果有包含文件，只能中断包含文件
 
 例题：
 
