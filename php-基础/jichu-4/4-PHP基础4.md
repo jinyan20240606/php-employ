@@ -21,17 +21,17 @@ typora-copy-images-to: images
 
 1、全局变量：在函数外面
 
-2、局部变量：在函数里面，默认情况下，函数内部是不会去访问函数外部的变量
+2、局部变量：在函数里面，默认情况下，函数内部是不会去访问函数外部的变量，---- 这一点跟js不一样
 
-3、超全局变量：可以在函数内部和函数外部访问
+3、超全局变量：可以在函数内部和函数外部访问，$下划线开头的都是内置的超全局变量
 
- ![1559615291159](images/1559615291159.png)
+![alt text](image.png)
 
 ```PHP
 <?php
 $num=10;   
 function fun() {
-	echo $num;     //Notice: Undefined variable: num  
+	echo $num;     //Notice: Undefined variable: num  ---- 这一点跟js不一样
 }
 fun();
 //函数内部默认不能访问函数外部的值
@@ -53,7 +53,7 @@ echo $_GET['num'];  //打印超全局变量的值  10
 
 
 
-在函数内部访问全局变量
+4、在函数内部访问全局变量
 
 ```php
 <?php
@@ -69,7 +69,7 @@ fun();
 ```php
 <?php
 function fun() {
-	$GLOBALS['num']=10;  //将值付给全局的$num
+	$GLOBALS['num']=10;  //将值付给全局的$num，相当于在全局定义了个$num变量
 }
 fun();
 echo $num;   //10
@@ -77,13 +77,14 @@ echo $num;   //10
 
 
 
-global关键字
+5、global关键字
 
 ```php
 <?php
 $num=10;
 function fun() {
-	global $num;   //将全局变量的$num的地址引入到函数内部  相当于$num=&GLOBALS['num']
+	global $num;   //将全局变量的$num的地址引入到函数内部  相当于在函数内部引用$num=&GLOBALS['num']
+	// 是地址传递，一改会同步更新外面的$num
 	echo $num;	//10
 	$num=100;
 }
@@ -116,11 +117,11 @@ function show() {
 show();
 ```
 
-2、global用于创建一个全局变量的引用
+2、global关键字用于创建一个全局变量的地址类型的引用（不是值引用）
 
 
 
-注意：常量没有作用域的概念
+注意：常量没有作用域的概念，外部可以访问内部，内部可以访问外部
 
 ```php
 <?php
@@ -144,7 +145,7 @@ echo PI;   //3.14
 
 #### 1.2.2  静态变量（static）
 
-静态变量一般指的是静态局部变量。
+静态变量一般指的是静态局部变量。一般放在函数内部，没有全局这一说法。
 
 静态变量只初始化一次
 
@@ -179,7 +180,7 @@ fun();	//12
 ```php
 <?php
 function fun1() {
-	define('num',10);
+	define('num',10);// 定义常量
 }
 function fun2() {
 	echo num;   //10
@@ -215,7 +216,7 @@ $fun();   //10
 
 
 
-思考：如何在函数内部访问函数外部变量
+思考：如何在函数内部访问函数外部变量 ---> 共4种方法
 
 1、使用超全局变量
 
@@ -233,8 +234,8 @@ $fun();   //10
 <?php
 $num=10;
 function test() {
-	$num=20;
-	$fun=function() use($num) {   //只能引入一层
+	$num=20;// 如果把这个注释，它下面的use也不会引用到外层的10.
+	$fun=function() use($num) {   //只能引入一层，
 		echo $num;
 	};
 	$fun();
@@ -328,9 +329,9 @@ for($i=1;$i<=10;$i++)
 
 ## 1.4  包含文件
 
-场景：
+场景：解决如多个网页中复用Header和Footer的公共文件的包含
 
- ![1559630150559](images/1559630150559.png)
+- 包含文件，文件后缀html和php文件都可以
 
 #### 1.4.1  包含文件的方式
 
@@ -343,24 +344,16 @@ for($i=1;$i<=10;$i++)
 4、include_once： 包含一次
 
 
+小结区别：
 
- ![1559630561486](images/1559630561486.png)
-
- ![1559630588666](images/1559630588666.png)
-
-小结：
-
-1、require遇到错误抛出error类别的错误，停止执行
-
-2、include遇到错误抛出warning类型的错误，继续执行
-
-3、require_once、include_once只能包含一次
-
-4、HTML类型的包含页面中存在PHP代码，如果包含到PHP中是可以被执行的
-
-5、包含文件相当于把包含文件中的代码拷贝到主文件中执行，魔术常量除外，魔术常量获取的是所在文件的信息。
-
-6、包含在编译时不执行、运行时加载到内存、独立编译包含文件
+1. require遇到错误抛出error类别的错误，停止执行
+2. include遇到错误抛出warning类型的错误，继续执行
+3. require_once、include_once只能包含一次
+4. HTML类型的包含页面中存在PHP代码，如果包含到PHP中是可以被执行的
+   1. php文件写html是可以的，但html文件写php是不执行的,静态网页在服务器是不执行的。
+   2. 但是html文件写php 如果被包含在php文件中是可以执行的。
+5. 包含文件相当于把包含文件中的代码拷贝到主文件中执行，魔术常量除外，魔术常量获取的是所在文件的信息。
+6. 包含在编译时不执行、运行时加载到内存、独立编译包含文件
 
 
 
@@ -375,7 +368,8 @@ for($i=1;$i<=10;$i++)
 
 ```php
 require './head.html';   //在当前目录下查找
-require 'head.html';	  //受include_path配置影响
+require 'head.html';	  //受配置文件中下include_path配置影响
+// 通过phpinfo();查看当前php配置信息
 ```
 
  ![1559631648089](images/1559631648089.png)
@@ -386,12 +380,12 @@ include_path的使用场景：
 
 ```php
 <?php
-set_include_path('c:\aa\bb\cc\dd');  //设置include_path
+set_include_path('c:\aa\bb\cc\dd');  //设置配置文件include_path，分号隔开，从左到右依次查找
 require 'head1.html';	  //受include_path配置影响
 require 'head2.html';
 ```
 
-include_path可以设置多个，路径之间用分号隔开
+include_path可以设置多个，路径之间用分号隔开，从左到右依次查找
 
 ```php
 set_include_path('c:\aa\bb\cc\dd;d:\\');
@@ -420,9 +414,9 @@ notice和warning报错后继续执行，error报错后停止执行
 
 #### 1.5.2  错误的提示方法
 
-方法一：显示在浏览器上
-
-方法二：记录在日志中
+- 方法一：显示在浏览器上
+- 方法二：记录在日志中
+  - 一句代码都不用写，只需要改下面的配置就可以
 
 
 
@@ -430,7 +424,7 @@ notice和warning报错后继续执行，error报错后停止执行
 
 在php.ini中
 
-```
+```php
 1. error_reporting = E_ALL：报告所有的错误
 2. display_errors = On：将错误显示在浏览器上
 3. log_errors = On：将错误记录在日志中
@@ -449,6 +443,8 @@ notice和warning报错后继续执行，error报错后停止执行
 ```php
 <?php
 $debug=false;		//true:开发模式  false：运行模式
+// ini_set 内置更改配置文件的函数，在这函数里改配置，不需要重启服务器
+
 ini_set('error_reporting',E_ALL);	//所有的错误有报告
 if($debug){
 	ini_set('display_errors','on');	//错误显示是浏览器上
@@ -478,7 +474,7 @@ if($age>80){
 	//trigger_error('年龄不能超过80岁');  //默认触发了notice级别的错误
 	//trigger_error('年龄不能超过80岁',E_USER_NOTICE);	//触发notice级别的错误
 	//trigger_error('年龄不能超过80岁',E_USER_WARNING);
-	trigger_error('年龄不能超过80岁',E_USER_ERROR);   //错误用户error错误
+	trigger_error('年龄不能超过80岁',E_USER_ERROR);   //错误用户error错误，error错误中断下面语句执行
 }
 ```
 
@@ -492,7 +488,7 @@ if($age>80){
 function error() {
 	echo '这是自定义错误处理';
 }
-set_error_handler('error');	//注册错误处理函数,只要有错误就会自动的调用错误处理函数
+set_error_handler('error');	//注册错误处理函数，注意是传的字符串,只要有错误就会自动的调用错误处理函数
 echo $num;
 ```
 
@@ -531,7 +527,7 @@ function error($errno,$errstr,$errfile,$errline) {
 	echo "错误文件：{$errfile}<br>";
 	echo "错误行号：{$errline}<br>";
 }
-set_error_handler('error');
+set_error_handler('error');// 传的是字符串
 echo $num;
 
 //运行结果
@@ -609,11 +605,11 @@ echo is_dir('./aaa')?'是文件夹':'不是文件夹';
 
 ```php
 $folder=opendir('./');	//打开目录
-//var_dump($folder);		//resource(3) of type (stream) 
-while($f=readdir($folder)){	//读取文件夹
+//var_dump($folder);		//resource(3) of type (stream)   resource数据类型
+while($f=readdir($folder)){	//读取文件夹  ： 读取文件夹函数是一次一次执行读出来的，需要多次执行，每次执行返回一个目录中的一个文件
 	if($f=='.' || $f=='..')
 		continue;
-	echo iconv('gbk','utf-8',$f),'<br>';  //将gbk转成utf-8
+	echo iconv('gbk','utf-8',$f),'<br>';  //将gbk转成utf-8，目前操作系统是gbk的或者gbk312都是简体中文，读取的是gbk，但是操作系统显示是utf8
 }
 closedir($folder);		//关闭文件夹
 ```
@@ -621,7 +617,7 @@ closedir($folder);		//关闭文件夹
 小结：
 
 ```
-1、opendir()返回资源类型
+1、opendir()返回资源类型-数据类型
 2、每个文件夹中都有.和..
 3、iconv()用来做字符编码转换
 ```
