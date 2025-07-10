@@ -22,7 +22,7 @@ typora-copy-images-to: images
 ```php
 <?php
 $str="床前明月光，\r\n疑是地上霜。\r\n举头望明月，\r\n低头思故乡。";
-file_put_contents('./test.txt',$str);  //将字符串写到文本中
+file_put_contents('./test.txt',$str);  //将字符串写到文本文件中，没有会新建文件
 ```
 
 小结：
@@ -32,16 +32,17 @@ file_put_contents('./test.txt',$str);  //将字符串写到文本中
 2、在文本中换行是\r\n
 
 ```
-\r:回车   光标移动到当前行的最前面
-\n:换行	将光标下移动一行
+\r:回车   光标移动到当前行的最前面。即起始位置
+\n:换行	，直接将光标下移动一行，不左右移动，
+\t:tab键
 按键盘的回车键做了两步，第一步将光标移动到当前行的最前面，第二步下移一行。
 ```
 
-3、\r\n是特殊字符，必须放在双引号内
+3、\r\n是特殊字符，必须放在双引号内。若放在单引号不管用直接变成字符串了。
 
 
 
-**2、**将整个文件读入一个字符串
+**2、**读取文件：将整个文件读入一个字符串
 
 ```php
 //方法一：
@@ -139,7 +140,9 @@ if(file_exists($path)){		//文件存在
 
 **7、**二进制读取【fread(文件指针，文件大小)】
 
-文件的存储有两种：字符流和二进制流
+- 键盘上的每个键都对应一个ascii码在计算机都有对应的码表示，AScii码有两种，一种是可见的，一种是不可见的，键盘上的数字字母键是可见的，不可见的比如回车，换行，退格。
+
+文件的存储有两种：字符流(存储着每个Ascii码级别的字符，对回车换行都清晰的存储的对应字符)和二进制流(01010)
 
 二进制流的读取按文件大小来读的。
 
@@ -147,6 +150,7 @@ if(file_exists($path)){		//文件存在
 $path='./face.jpg';
 $fp=fopen($path,'r');
 header('content-type:image/jpeg');	//告知浏览器下面的代码通过jpg图片方式解析
+// 读取后的二进制内容，直接echo是以字符串的形式解析的二进制，所以浏览器显示的是一串乱码，你需要指定header响应头部格式，让以图片格式显示
 echo fread($fp,filesize($path));	//二进制读取
 ```
 
@@ -159,9 +163,10 @@ echo file_get_contents('./face.jpg');
 
 小结：
 
-1、文本流有明确的结束符，二进制流没有明确的结束符，通过文件大小判断文件是否读取完毕
+1. 文本流有明确的结束符，二进制流没有明确的结束符，通过文件大小判断文件是否读取完毕
+   1. 读文件时，遇到结束符就结束读取，二进制流没有结束符，只能通过大小判断。。
 
-2、file_get_contents()既可以进行字符流读取，也可以进行二进制读取。
+2. file_get_contents()既可以进行字符流读取，也可以进行二进制读取。
 
 
 
@@ -184,11 +189,7 @@ echo file_get_contents('./face.jpg');
 
 ​	get提交在地址上可以看到参数
 
- ![1559791997833](images/1559791997833.png)
-
-​        post提交在地址栏上看不到参数
-
- ![1559792216632](images/1559792216632.png)
+​   post提交在地址栏上看不到参数
 
  
 
@@ -261,7 +262,7 @@ header('location:index.php?name=tom&age=22')
 ```
 $_POST：数组类型，保存的POST提交的值
 $_GET：数组类型，保存的GET提交的值
-$_REQUEST：数组类型，保存的GET和POST提交的值
+$_REQUEST：数组类型，保存的GET和POST提交的值---他是获取get一次获取post一次肯定效率会低些
 ```
 
 例题：
@@ -312,7 +313,7 @@ echo $_REQUEST['math'];
 
 思考题
 
-在一个请求中，既有get又有post，get和post传递的名字是一样的，这时候通过$_REQUET获取的数据是什么?
+在一个请求中，既有get又有post，get和post传递的字段如name是一样的，这时候通过$_REQUET获取的数据是什么?
 
 答：结果取决于配置文件
 
@@ -384,6 +385,7 @@ if(isset($_POST['button'])) {
 	echo '姓名：'.$_POST['username'].'<br>';
 	echo '密码：'.$_POST['pwd'].'<br>';
 	echo '性别：'.$_POST['sex'].'<br>';
+	// implode：数组链接成字符串
 	echo '爱好：',isset($_POST['hobby'])?implode(',',$_POST['hobby']):'没有爱好','<br>';
 	echo '籍贯：'.$_POST['jiguan'],'<br>';
 	echo '留言：'.$_POST['words'];
@@ -431,13 +433,16 @@ if(isset($_POST['button'])) {
 
 表单的enctype属性
 
-​	默认情况下，表单传递是字符流，不能传递二进制流，通过设置表单的enctype属性传递复合数据。
+​	默认情况下，表单传递是字符串流，不能传递二进制流，通过设置表单的enctype属性传递复合数据。
 
 enctype属性的值有：
 
 1. application/x-www-form-urlencoded：【默认】，表示传递的是带格式的文本数据。
+   1. 把整个表单的数据转成xml的格式一起提交，传的是带格式的字符串，会带上换行符等
 2. multipart/form-data：复合的表单数据（字符串，文件），文件上传必须设置此值
+   1. 既能传字符串也能传二进制
 3. text/plain：用于向服务器传递无格式的文本数据，主要用户电子邮件
+   1. 也是传字符串，不带格式的，纯文本，不带换行符就是纯文本
 
 单词
 
@@ -454,7 +459,7 @@ form-data：表单数组
 1、`$_FILES[][‘name’]`：上传的文件名
 2、`$_FILES[][‘type]`：上传的类型，这个类型是MIME类型（image/jpeg、image/gif、image/png）
 3、`$_FILES[][‘size’]`：文件的大小，以字节为单位
-4、`$_FILES[][‘tmp_name’]`：文件上传时的临时文件
+4、`$_FILES[][‘tmp_name’]`：文件上传时的临时文件（一个文件传到另一个地方，要先给这个文件进行像搬家似的打包的，分包发送，先存个临时文件临时保存下来，等包到齐了后，整合下临时文件拆成最终的文件到目标文件里）
 5、`$_FILES[][‘error’]`：错误编码(值有0、1、2、3、4、6、7)0表示正确
 
  ![1559802500855](images/1559802500855.png)
@@ -467,13 +472,13 @@ form-data：表单数组
 | ---- | ------------------------------------------------------------ |
 | 0    | 正确                                                         |
 | 1    | 文件大小超过了php.ini中允许的最大值    upload_max_filesize = 2M |
-| 2    | 文件大小超过了表单允许的最大值                               |
+| 2    | 文件大小超过了表单允许的最大值                            |
 | 3    | 只有部分文件上传                                             |
 | 4    | 没有文件上传                                                 |
 | 6    | 找不到临时文件                                               |
 | 7    | 文件写入失败                                                 |
 
-  ![1559803920217](images/1559803920217.png)
+![alt text](image-1.png)
 
 
 
@@ -540,12 +545,14 @@ max_file_uploads = 20：允许同时上传20个文件
 ```php
 <?php
 $path='face.stu.jpg';
-//echo strrchr($path,'.');	//从最后一个点开始截取，一直截取到最后
+//echo strrchr($path,'.');	//从最后一个点开始截取，一直截取到最后  --得到 '.jpg'
+// time(); ----- 得到时间戳的函数
+// 时间戳后面拼个3位的随机数
 echo time().rand(100,999).strrchr($path,'.');   
 ```
 
 方法二：通过uniqid()实现
-
+// 基于当前时间的微秒数的唯一id
 ```php
 $path='face.stu.jpg';
 echo uniqid().strrchr($path,'.'),'<br>';   //生成唯一的ID
@@ -567,7 +574,7 @@ echo uniqid('goods_',true).strrchr($path,'.'),'<br>';  //唯一ID+随机数
 if(!empty($_POST)) {
 	$allow=array('.jpg','.png','.gif');	//允许的扩展名
 	$ext=strrchr($_FILES['face']['name'],'.');  //上传文件扩展名
-	if(in_array($ext,$allow))
+	if(in_array($ext,$allow)) // 是否在右侧数组中
 		echo '允许上传';
 	else
 		echo '文件不合法';
@@ -584,7 +591,7 @@ if(!empty($_POST)) {
 
 
 
-方法二：通过`$_FIELS[]['type']`类型（不能识别文件伪装）
+方法二：通过`$_FIELS[]['type']`类型（不能识别文件伪装）判断mime类型
 
 ```php+HTML
 <body>
@@ -611,7 +618,8 @@ if(!empty($_POST)) {
 
 方法三：php_fileinfo扩展（可以防止文件伪装）
 
-​	在php.ini中开启fileinfo扩展
+-  在php安装目录中，exp目录是可扩展的扩展目录，需要在配置文件中按需使用扩展
+-  在php.ini中开启fileinfo扩展，该扩展就可以防止文件扩展
 
 ```php
 extension=php_fileinfo.dll
@@ -628,7 +636,7 @@ extension=php_fileinfo.dll
 <?php
 if(!empty($_POST)) {
 	//第一步：创建finfo资源
-	$info=finfo_open(FILEINFO_MIME_TYPE);
+	$info=finfo_open(FILEINFO_MIME_TYPE);// 预定义常量
 	//var_dump($info);		//resource(2) of type (file_info) 
 	//第二步：将finfo资源和文件做比较
 	$mime=finfo_file($info,$_FILES['face']['tmp_name']);
@@ -665,6 +673,12 @@ if(!empty($_POST)) {
 第三步：验证大小
 
 第四步：验证是否是http上传
+
+执行php不一定是apache服务器执行的，也可以用终端php命令去执行
+
+![alt text](image.png)
+
+is_uploaded_file($file['tmp_name'])：可以通过这个函数判断这个文件是不是通过http上传的。
 
 第五步：上传实现
 
@@ -759,7 +773,9 @@ echo date('Y-m-d H:i:s'),'<br>';	//将当前的时间转成年-月-日 小时:�
 
 2、设置时区（php.ini）
 
- ![1559811342514](images/1559811342514.png)
+默认是东一区，格林尼治时间，需要改成东八区，中国时间
+
+![alt text](image-2.png)
 
 ```
 PRC：中华人民共和国
@@ -769,8 +785,7 @@ PRC：中华人民共和国
 
 3、PHP的执行可以不需要Apache的参与
 
- ![1559809731518](images/1559809731518.png)
-
+![alt text](image.png)
 
 
 ## 1.8  作业
