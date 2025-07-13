@@ -2,6 +2,41 @@
 typora-copy-images-to: images
 ---
 
+- [补充](#补充)
+- [1.1  今日目标](#11--今日目标)
+- [1.2  数据类型](#12--数据类型)
+    - [1.2.1  数值型](#121--数值型)
+    - [1.2.2  字符型](#122--字符型)
+    - [1.2.3  枚举(enum)](#123--枚举enum)
+    - [1.2.4  集合(set)](#124--集合set)
+    - [1.2.5  日期时间型](#125--日期时间型)
+    - [1.2.6  Boolean](#126--boolean)
+    - [1.2.6  练习题](#126--练习题)
+- [1.3  列属性](#13--列属性)
+    - [1.3.1  是否为空（null|not null）](#131--是否为空nullnot-null)
+    - [1.3.2  默认值（default）](#132--默认值default)
+    - [1.3.3  自动增长（auto\_increment）](#133--自动增长auto_increment)
+    - [1.3.4  主键（primary key）](#134--主键primary-key)
+    - [1.3.5  唯一键（unique）](#135--唯一键unique)
+    - [1.3.6  备注（comment）](#136--备注comment)
+- [1.4  SQL注释](#14--sql注释)
+- [1.5  数据完整性](#15--数据完整性)
+    - [1.5.1  数据完整性包括](#151--数据完整性包括)
+    - [1.5.2  主表和从表](#152--主表和从表)
+    - [1.5.3  外键（foreign key）](#153--外键foreign-key)
+    - [1.5.4  三种外键操作](#154--三种外键操作)
+- [1.6  补充](#16--补充)
+
+
+## 补充
+
+phpstudy中Mysql默认不是严格模式,将Mysql配置成严格模式,严格模式有一点错都会报出来,如建表数据时插入中文会报错
+
+打开my.ini中,在sql-mode字段中配置追加值:STRICT_TRANS_TABLES
+
+![alt text](image.png)
+![alt text](image-1.png)
+
 ## 1.1  今日目标
 
 1. 掌握char和varchar的应用；
@@ -21,14 +56,25 @@ MySQL中的数据类型是强类型
 
 #### 1.2.1  数值型
 
+**字节计算**
+
+> https://blog.csdn.net/m0_48011056/article/details/125153980
+
+1. 1字节=8位,1KB=1024字节,1MB=1024KB,1GB=1024MB,1TB=1024GB,
+2. 无符号的话,8位就是11111111,第一位是正常的数表示,最大值是2的8次方-1数,就是255,最小值00000000为0,==>(0-255共256个数),
+3. 有符号整数就是为了表示负数,默认把8位的第一位用来表示符号,0负1正,实际数值范围就变成了7位,也就相当于1分为2了,数据库中整型类型默认是无符号整数
+   1. 有符号的话就是一份为2就是-128到127之间(中间包括个0).这是人类的理解,实际上计算机规则是安装第一位补码来的,直接就是负数到正数范围
+
+
+
 **1、  整型**
 
 | 整形      | 占用字节数 | 范围                                     |
 | --------- | ---------- | ---------------------------------------- |
-| tinyint   | 1          | -128~127                                 |
-| smallint  | 2          | -32768~32767                             |
-| mediumint | 3          | -8388608~8388607                         |
-| int       | 4          | -2147483648~2147483647                   |
+| tinyint   | 1          | -128~127    (1百)                        |
+| smallint  | 2          | -32768~32767      (3万)                  |
+| mediumint | 3          | -8388608~8388607  (838万)                |
+| int       | 4          | -2147483648~2147483647 (21亿)            |
 | bigint    | 8          | -9223372036854775808~9223372036854775807 |
 
 选择的范围尽可能小，范围越小占用资源越少
@@ -47,11 +93,11 @@ ERROR 1264 (22003): Out of range value for column 'id' at row 1
 
 
 
-无符号整形（unsigned） 无符号整形就是没有负数，无符号整数是整数的两倍
+**无符号整形（unsigned）** 无符号整形就是没有负数，无符号整数是整数的两倍,当数据整型类型业务中确定没有负数的话,可以改成无符号全正表示(默认是有符号类型存储)
 
 ```mysql
 mysql> create table stu2(
-    -> id tinyint unsigned    # 无符号整数
+    -> id tinyint unsigned    # 无符号整数就是把它默认的整形范围改成全部正数的范围(如-128到127变成0到255)
     -> );
 Query OK, 0 rows affected (0.02 sec)
 
@@ -61,11 +107,15 @@ Query OK, 1 row affected (0.00 sec)
 
 
 
-整形支持显示宽度，显示宽带是最小的显示位数，如int(11)表示整形最少用11位表示，如果不够位数用0填充。显示宽度默认不起作用，必须结合zerofill才起作用。
+**整形支持显示宽度**，显示宽带是最小的显示位数，如int(11)表示整形最少用11位表示，如果不够位数用0填充。显示宽度默认不起作用，必须结合zerofill才起作用。
+
+![alt text](image-2.png)
+
+tinyint后面的3是代表的3位,3位数是显示宽度,启用显示宽度的话,会默认补0成003.那个3是可以创建表时用来指定的,默认不写就是最大tinyint的范围位数,你指定的位数别超过最大范围就行
 
 ```mysql
 mysql> create table stu4(
-    -> id int(5),
+    -> id int(5),   指定显示宽度5位
     -> num int(5) zerofill   # 添加前导0,int(5)显示宽带是5
     -> );
 Query OK, 0 rows affected (0.05 sec)
@@ -94,22 +144,26 @@ mysql> select * from stu4;
 
 **2、浮点型**
 
+浮点数在数据库中有2种:
+
 | 浮点型             | 占用字节数 | 范围               |
 | ------------------ | ---------- | ------------------ |
 | float（单精度型）  | 4          | -3.4E+38~3.4E+38   |
 | double（双精度型） | 8          | -1.8E+308~1.8E+308 |
 
-浮点型的声明：float(M,D)   double(M,D)
+浮点型的显示声明：float(M,D)   double(M,D)
 
 ```
- M：总位数   D：小数位数
+不管输入多少位,在数据存储后显示时,都是按照M,D来近似显示的,
+
+ M：总位数   D：小数后几位数
 ```
 
 例题
 
 ```mysql
 mysql> create table stu5(
-    -> num1 float(5,2),   -- 浮点数
+    -> num1 float(5,2),   -- 浮点数 
     -> num2 double(6,1)	  -- 双精度数
     -> );
 Query OK, 0 rows affected (0.05 sec)
@@ -128,7 +182,7 @@ mysql> select * from stu5;
 
 
 
-MySQL浮点数支持科学计数法
+**MySQL浮点数支持科学计数法**
 
 ```mysql
 mysql> create table stu6(
@@ -171,12 +225,12 @@ mysql> select * from stu6;
 ```
 1、浮点数有单精度和双精度
 2、浮点数支持科学计数法
-3、浮点数精度会丢失
+3、浮点数精度会丢失会四舍五入
 ```
 
 
 
-3、小数（定点数）
+**3、小数（定点数）**
 
 原理：将整数部分和小数部分分开存储
 
@@ -209,17 +263,18 @@ mysql> select * from stu8;
 小结：
 
 ```
-1、decimal是变长的，大致是每9个数字用4个字节存储，整数和小数分开计算。M最大是65,D最大是30，默认是（10,2）。
-2、定点和浮点都支持无符号、显示宽度0填充。
+0、前面的整型每种类型都是固定占几个字节的,那都是属于定长
+1、decimal是变长的，到底占几个字节不确定,大致是每9个数字用4个字节存储，整数和小数分开计算。M最大是65,D最大是30，默认是（10,2）。
+2、定点和浮点都支持无符号unset、zerofill显示宽度0填充。
 ```
 
 
 
 #### 1.2.2  字符型
 
-在数据库中没有字符串概念，只有字符，所以数据库中只能用单引号
+1. 强数据类型里面双引号是字符串,单引号是字符,在数据库中没有字符串概念，只有字符，所以数据库中只能用单引号,没有双引号
 
-| 数据类型   | 描述         |
+| 数据类型   | 描述 (字节数)        |
 | ---------- | ------------ |
 | char       | 定长字符，最大可以到255 |
 | varchar    | 可变长度字符，最大可以到65535 |
@@ -228,27 +283,24 @@ mysql> select * from stu8;
 | mediumtext | 2^24^–1        |
 | longtext   | 2^32^–1        |
 
-char(4)：存放4个字符，中英文一样。
+char(4)：存放4个字符，中英文一样。char最大可以到255个字节长度
 
 varchar(L)实现变长机制，需要额外的空间来记录数据真实的长度。
 
-L的理论长度是65535，但事实上达不到，因为有的字符是多字节字符，所以L达不到65535。
+L的理论长度是65535字节，但事实上达不到，因为有的字符是多字节字符，所以L达不到65535字节。
 
- ![1560050625970](images/1560050625970.png)
+1. 定长和变长的区别: 
+   1. char(4)代表字符4个字节长度,就不能存放5个字节长度,但是可以存放2个,剩下的2个空间还是会占用浪费
+   2. varchar(4)也代表字符4个长度的,也不能存放5个长度,若存2个,剩下的空间就回收了,不会浪费空间
+2. utf8下,1个字符大概3个字节,gbk下1个字符大概2个字节,所以varchar的长度达不到65535跟字符编码也有关系
 
- ![1560050684461](images/1560050684461.png)
-
-
-
-text系列的类型在表中存储的是地址，占用大小大约10个字节
-
- ![1560051173896](images/1560051173896.png)
-
+![alt text](image-3.png)
 
 
 一个记录的所有字段的总长度也不能超过65535个字节。
+text,XXXXtext系列的类型由于在表中存储的是地址，占用大小大约10个字节,char和varchar存储的是4个字节,所以text类型值不会超过所有字段总长度的.
 
- ![1560050966898](images/1560050966898.png)
+![alt text](image-4.png)
 
 
 
@@ -275,7 +327,7 @@ mysql> create table stu12(
 Query OK, 0 rows affected (0.06 sec)
 
 -- 插入的枚举值只能是枚举中提供的选项
-mysql> insert into stu12 values ('tom','男');
+mysql> insert into stu12 values ('tom','男1');
 Query OK, 1 row affected (0.00 sec)
 -- 报错，只能插入男、女、保密
 mysql> insert into stu12 values ('tom','不告诉你');
@@ -357,16 +409,16 @@ mysql> select * from stu13;
 '爬山','读书','游泳','烫头'
   1		2		4	8
   
-mysql> select hobby+0 from stu13;
+mysql> select hobby+0 from stu13; // hobby+0就是把它集合值转化成数字
 +---------+
 | hobby+0 |
 +---------+
 |       1 |
-|       5 |
+|       5 |         '爬山,游泳' ==> 爬山+游泳就是 1+4 = 5来代表
 |       5 |
 +---------+
 
-mysql> insert into stu13 values ('rose',15);
+mysql> insert into stu13 values ('rose',15); // 加15就是选择'爬山,读书,游泳,烫头'  都选上了
 Query OK, 1 row affected (0.00 sec)
 ```
 
@@ -534,8 +586,13 @@ boolean型在MySQL中对应的是tinyint。
 性别一般使用什么数据类型存储?				  char  tinyint  enum
 年龄信息一般使用什么数据类型存储?			 tinyint
 照片信息一般使用什么数据类型存储?		 	 binary
-薪水一般使用什么数据类型存储?			      decimal
+薪水一般使用什么数据类型存储?			      decimal绝对不能用浮点,必须要定点
 ```
+
+1.  电话号码不是数字,起的是字符的作用
+2.  用数字的特点是要用来运算的,电话号码是个字符的作用
+3.  手机号码定长,字符串
+4.  照片一般是存照片地址,不是把整个照片存进来二进制的形式,考试用
 
 
 
@@ -594,13 +651,16 @@ default关键字用来插入默认值
 
 #### 1.3.3  自动增长（auto_increment）
 
-字段值从1开始，每次递增1，自动增长的值就不会有重复，适合用来生成唯一的id。在MySQL中只要是自动增长列必须是主键
+字段值从1开始，每次递增1，自动增长的值就不会有重复，适合用来生成唯一的id。
+
+在MySQL中只要是自动增长列必须是主键
 
 
 
 #### 1.3.4  主键（primary key）
 
-主键概念：唯一标识表中的记录的一个或一组列称为主键。
+主键概念：唯一标识表中的记录的一个或一组列(一个字段或多个字段组合)称为主键。
+
 
 特点：
 
@@ -614,6 +674,7 @@ default关键字用来插入默认值
 ```
 1、保证数据完整性
 2、加快查询速度
+    加了主键就会自动创建索引
 ```
 
 选择主键的原则
@@ -645,7 +706,9 @@ mysql> create table stu21(
 Query OK, 0 rows affected (0.02 sec)
 ```
 
-组合键
+组合键: 组合起来作为唯一主键标识
+
+![alt text](image-5.png)
 
 ```mysql
 mysql> create table stu22(
@@ -694,7 +757,7 @@ Records: 0  Duplicates: 0  Warnings: 0
 
 
 
-插入数据
+插入数据: 指有主键时有auto_increment时怎么插入数据
 
 ```mysql
 mysql> create table stu25(
@@ -711,6 +774,11 @@ Query OK, 1 row affected (0.06 sec)
 mysql> insert into stu25 values (null,'berry');
 Query OK, 1 row affected (0.00 sec)
 ```
+
+![alt text](image-6.png)
+![alt text](image-7.png)
+
+删除一个值后,原来的主键5就被删了,再新增数据,递增就是6了,5不能再重复使用,因为为了后面恢复数据用,要是复用5,后面恢复时不知道以哪个5为基准
 
 
 
@@ -744,8 +812,8 @@ Query OK, 1 row affected (0.00 sec)
 
 | 键     | 区别                                                 |
 | ------ | ---------------------------------------------------- |
-| 主键   | 1、不能重复，不能为空<br />2、一个表只能有一个主键   |
-| 唯一键 | 1、不能重刻，可以为空<br />2、一个表可以有多个唯一键 |
+| 主键   | 1、不能重复，不能为空NULL<br />2、一个表只能有一个主键   |
+| 唯一键 | 1、不能重刻，可以为空NULL(重复的NULL)<br />2、一个表可以有多个唯一键 |
 
 例题
 
@@ -795,7 +863,7 @@ mysql> desc stu28;
 
 通过show create table 查看唯一键的名字
 
- ![1560067957522](images/1560067957522.png)
+![alt text](image-8.png)
 
 通过唯一键的名字删除唯一键
 
@@ -809,7 +877,7 @@ Records: 0  Duplicates: 0  Warnings: 0
 
 #### 1.3.6  备注（comment）
 
-说明性文本
+说明性文本,给每个字段添加备注
 
 ```mysql
 mysql> create table stu29(
@@ -820,8 +888,6 @@ Query OK, 0 rows affected (0.03 sec)
 ```
 
 注意：备注属于SQL代码的一部分
-
- ![1560068676274](images/1560068676274.png)
 
 
 
@@ -835,17 +901,17 @@ Query OK, 0 rows affected (0.03 sec)
 多行注释  /*     */
 ```
 
-
-
- ![1560068815346](images/1560068815346.png)
+![alt text](image-9.png)
 
 
 
 ## 1.5  数据完整性
 
+正确性(数据类型准不准确)+准确性(范围准不准确)=完整型
+
 #### 1.5.1  数据完整性包括
 
-1、实体完整性
+1、实体完整性(1条记录就是一个实体)
 
 ```
 1、主键约束
@@ -853,7 +919,9 @@ Query OK, 0 rows affected (0.03 sec)
 3、标识列
 ```
 
-2、 域完整性
+如name字段有两个记录重名无法区分两条记录,就失去了实体完整性
+
+2、 域完整性(记录没问题,数据类型写错了)
 
 ```
 1、数据类型约束
@@ -863,6 +931,9 @@ Query OK, 0 rows affected (0.03 sec)
 
 3、 引用完整性
 
+![alt text](image-10.png)
+
+保持2个表之间的引用,数据完整
 ```
 外键约束
 ```
@@ -886,21 +957,27 @@ Query OK, 0 rows affected (0.03 sec)
 
 #### 1.5.3  外键（foreign key）
 
-外键：从表中的公共字段
+外键：从表中的公共字段(关联到主表)
+
+![alt text](image-12.png)
+
+下面可以看到，直接在从表中新增1号，主表中还没有1号数据，这时候从表就新增数据失败
+
+![alt text](image-11.png)
 
 ```mysql
 -- 创建表的时候添加外键
-drop table if exists stuinfo;
+drop table if exists stuinfo; // 主表
 create table stuinfo(
        id tinyint primary key,
        name varchar(20)
 )engine=innodb;
 
-drop table if exists stuscore;
+drop table if exists stuscore; // 从表
 create table stuscore(
        sid tinyint primary key,
        score tinyint unsigned,
-       foreign key(sid) references stuinfo(id)   -- 创建外键
+       foreign key(sid) references stuinfo(id)   -- 创建外键,数据类型必须一样,名字可以不一样
 )engine=innodb;
 
 -- 通过修改表的时候添加外键
@@ -918,18 +995,19 @@ create table stuscore(
        score tinyint unsigned
 )engine=innodb;
 
-alter table stuscore add foreign key (sid) references stuinfo(id)
+alter table stusco dre add foreign key (sid) references stuinfo(id)
 ```
 
-
+![alt text](image-13.png)
+含引用关系时，直接删除主表是删除失败的。
 
 删除外键
 
 ```
-通过外键的名字删除外键
-```
+通过外键的名字删除外键，通过show create table 查看外键的名字
 
- ![1560071984394](images/1560071984394.png)
+```
+![alt text](image-15.png)
 
 ```mysql
 -- 删除外键
@@ -941,7 +1019,7 @@ Records: 0  Duplicates: 0  Warnings: 0
 小结：
 
 ```
-1、只有innodb才能支持外键
+1、只有innodb引擎才能支持外键.
 2、公共字段的名字可以不一样，但是数据类型要一样
 ```
 
@@ -949,7 +1027,7 @@ Records: 0  Duplicates: 0  Warnings: 0
 
 #### 1.5.4  三种外键操作
 
-1、  严格限制（参见主表和从表）
+1、  严格限制（参见1.5.2 主表和从表）
 
 2、  置空操作（set null）：如果主表记录删除，或关联字段更新，则从表外键字段被设置为null。
 
@@ -957,23 +1035,31 @@ Records: 0  Duplicates: 0  Warnings: 0
 
 语法：foreign key (外键字段) references 主表名 (关联字段) [主表记录删除时的动作] [主表记录更新时的动作]。
 
-一般说删除时置空，更新时级联。
+**一般说删除时置空，更新时级联。**
 
 ```mysql
-drop table if exists stuinfo;
+drop table if exists stuinfo; // 主表
 create table stuinfo(
        id tinyint primary key comment '学号，主键',
        name varchar(20) comment '姓名'
 )engine=innodb;
 
-drop table if exists stuscore;
+drop table if exists stuscore;  // 从表
 create table stuscore(
        id int auto_increment primary key comment '主键',
-       sid tinyint comment '学号，外键',
+       sid tinyint comment '学号，外键', //（外键不能作主键，作了主键就无法作级联和置空）
        score tinyint unsigned comment '成绩',
        foreign key(sid) references stuinfo(id) on delete set null on update cascade
 )engine=innodb;
 ```
+
+![alt text](image-14.png)
+
+![alt text](image-16.png)
+
+都级联改成2了
+![alt text](image-17.png)
+
 
 小结：
 
