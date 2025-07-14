@@ -14,7 +14,7 @@ typora-copy-images-to: images
     - [1.3.3  绘制E-R图](#133--绘制e-r图)
     - [1.3.4   将E-R图转成表](#134---将e-r图转成表)
 - [1.4  数据规范化](#14--数据规范化)
-    - [1.4.1  第一范式：确保每列原则性](#141--第一范式确保每列原则性)
+    - [1.4.1  第一范式：确保每列原子性](#141--第一范式确保每列原子性)
     - [1.4.2  第二范式：非键字段必须依赖于键字段](#142--第二范式非键字段必须依赖于键字段)
     - [1.4.3  第三范式：消除传递依赖](#143--第三范式消除传递依赖)
     - [1.4.4  反3NF](#144--反3nf)
@@ -29,7 +29,7 @@ typora-copy-images-to: images
     - [1.5.7  having条件](#157--having条件)
     - [1.5.8 limit](#158-limit)
     - [1.5.9 查询语句中的选项](#159-查询语句中的选项)
-- [1.6   聚合函数](#16---聚合函数)
+- [1.6 聚合函数](#16-聚合函数)
 - [1.7   模糊查询](#17---模糊查询)
     - [1.7.1   通配符](#171---通配符)
     - [1.7.2   模糊查询（like）](#172---模糊查询like)
@@ -54,7 +54,8 @@ typora-copy-images-to: images
 
 ## 1.2  实体之间的关系
 
- ![](images/1560220896713.png)
+4大关系
+![alt text](image.png)
 
 
 
@@ -62,15 +63,21 @@ typora-copy-images-to: images
 
  主表中的一条记录对应从表中的多条记录
 
- ![1560221075643](images/1560221075643.png)
+![alt text](image-1.png)
 
-实现一对多的方式：主键和非主键建关系
+实现一对多的方式：主表的主键和从表的非主键建关系达成1对多
+
+必须是从表非主键，因为从表的主键不能重复，必须是其他字段作主键，该非主键字段可以重复，达成1对多关系
+
 
 问题：说出几个一对多的关系？
+
+如班级表里1个班级，对应从表学生表内，2个学生记录的班级号都是一样的，就是2个学生对应一个班级
 
 ```
 班主任表——学生表
 品牌表——商品表
+老师-学生：多对多，学生可以选多个老师，老师可以选多个学生
 ```
 
 
@@ -83,7 +90,7 @@ typora-copy-images-to: images
 
 #### 1.2.3  一对一（1:1）
 
- ![1560221405217](images/1560221405217.png)
+![alt text](image-2.png)
 
 
 
@@ -95,14 +102,18 @@ typora-copy-images-to: images
 答：在字段数量很多情况下，数据量也就很大，每次查询都需要检索大量数据，这样效率低下。我们可以将所有字段分成两个部分，“常用字段”和“不常用字段”，这样对大部分查询者来说效率提高了。【表的垂直分割】
 ```
 
+将来在表的数据优化中，我们会用到垂直分割。就是一对一分成2个表，就像在中间垂直切分一样，类似还有水平分割只拆分数据不拆分字段。
+
+
 
 
 #### 1.2.3  多对多（N：M）
 
 主表中的一条记录对应从表中的多条记录，从表中的一条记录，对应主表中的多条记录
 
- ![1560221806844](images/1560221806844.png)
+![alt text](image-3.png)
 
+第三张表含多个重复的班级和讲师
 
 
 如何实现多对多：利用第三张关系表
@@ -121,6 +132,8 @@ typora-copy-images-to: images
 如何实现一对一：主键和主键建关系
 如果实现一对多：主键和非主键建关系
 如何实现多对多：引入第三张关系表
+
+项目中----1对1只在数据库的优化中做一般用来做垂直分割的，用的最多的是1对多和多对多
 ```
 
 
@@ -132,10 +145,14 @@ typora-copy-images-to: images
 1. 收集信息：与该系统有关人员进行交流、坐谈，充分理解数据库需要完成的任务
 
 2. 标识对象（实体－Entity）：标识数据库要管理的关键对象或实体 
+   1. 这个系统里有几个对象实体参与
+   2. 后面1个对象就对应1个表
 
 3. 标识每个实体的属性（Attribute）
 
 4. 标识对象之间的关系（Relationship）
+   1. 用ER图来表示关系（Entity Relationship 实体关系图）
+   2. ![alt text](image-6.png)
 
 5. 将模型转换成数据库
 
@@ -159,35 +176,30 @@ BBS论坛的基本功能：
 实体一般是名词：
 1、用户对象
 2、板块对象
-3、帖子对象
+3、帖子对象（1个帖子可以多个跟帖，1对多）
 4、跟帖对象
 ```
 
+![alt text](image-4.png)
+
 第三步：标识每个实体的属性
 
- ![1560223195475](images/1560223195475.png)
+![alt text](image-5.png)
 
 
 
 第四步：标识对象之间的关系
-
+![alt text](image-7.png)
 
 
 #### 1.3.3  绘制E-R图
 
 E-R（Entity－Relationship）实体关系图）
 
- ![1560223286699](images/1560223286699.png)
-
-
-
- ![1560223316751](images/1560223316751.png)
-
-
 
 完整的E-R图
 
- ![1560223404717](images/1560223404717.png)
+![alt text](image-8.png)
 
 
 
@@ -200,15 +212,19 @@ E-R（Entity－Relationship）实体关系图）
 
 ## 1.4  数据规范化 
 
-#### 1.4.1  第一范式：确保每列原则性
+通过3个范式来规范化
+
+#### 1.4.1  第一范式：确保每列原子性
 
 第一范式：的目标是确保每列的原子性，一个字段表示一个含义
 
- ![1560224318942](images/1560224318942.png)
+![alt text](image-9.png)
+
+把中国北京市不够原子性，还能再拆分成中国和北京
 
 思考如下表是否满足第一范式
 
- ![1560224468259](images/1560224468259.png)
+![alt text](image-10.png)
 
 
 
@@ -222,25 +238,36 @@ E-R（Entity－Relationship）实体关系图）
 
 #### 1.4.2  第二范式：非键字段必须依赖于键字段
 
-第二范式：在满足第一范式的前提下，要求每个表只描述一件事情
+第二范式：在满足第一范式的前提下，要求每个表只描述一件事情（不是主键的一定要跟主键有关系）----键就是主键，非键就是非主键
 
-  ![](images/1560225066215.png)
+约束：的是主键与非主键的关系
+
+![alt text](image-11.png)
 
 思考：如下表设计是否合理
 
- ![1560225229812](images/1560225229812.png)
+![alt text](image-12.png)
+
+总结本质：1个表里的主键就是主题，非主键字段必须与主题相关，不i相关的不能放在1个表里，1个表只负责单一的任务事情
+
 
 #### 1.4.3  第三范式：消除传递依赖
 
 第三范式：在满足第二范式的前提下，除了主键以外的其他列消除传递依赖。
 
- ![1560225494968](images/1560225494968.png)
+约束：主要约束的是非主键之间的关系
+
+![alt text](image-13.png)
+
+解释：顾客编号和顾客姓名有重复依赖从属关系，顾客编号订好了，顾客姓名其实就已经固定好了，这时可以分表
 
 思考：如下表设计是否合理？
-
- ![1560225662925](images/1560225662925.png)
+![alt text](image-14.png)
 
 结论：不满足第三范式，因为语文和数学确定了，总分就确定了
+
+
+总结本质：就是你的表里的字段，将来是由用户进行自由增删改查的，相互依赖的键，万一单方面被用户删除了，就会导致数据的不一致性。依赖的键不能给用户操作，所以不能在表里，必须得是自动计算出来的。如语文数学和总分，你能单方面改总分字段码？？？不能
 
 #### 1.4.4  反3NF 
 
@@ -258,15 +285,15 @@ E-R（Entity－Relationship）实体关系图）
 
 小结
 
-1、第一范式约束的所有字段
+1、第一范式约束的所有字段原子化。
 
-2、第二范式约束的主键和非主键的关系
+2、第二范式约束的主键和非主键的关系必须要依赖（定义1张表首先要定调，整张表的主键，主要干的事）
 
-3、第三范式约束的非主键之间的关系
+3、第三范式约束的非主键之间的关系不能有依赖
 
-4、范式越高，冗余越少，但表业越多。
+4、范式越高，冗余越少，但表也越多。
 
-5、规范化和性能的关系 ：性能比规范化更重要
+5、规范化和性能的关系 ：性能比规范化更重要就是反三范式
 
 
 
@@ -290,15 +317,16 @@ E-R（Entity－Relationship）实体关系图）
 3、工时
 4、小时工资率
 ```
+![alt text](image-15.png)
 
- ![1560235875441](images/1560235875441.png)
+![alt text](image-16.png)
 
 
 
 ## 1.5  查询语句
 
 ```mysql
-语法：select [选项] 列名 [from 表名] [where 条件]  [group by 分组] [order by 排序][having 条件] [limit 限制]
+语法：select [选项] 列名 [as] [from 表名] [where 条件]  [group by 分组] [order by 排序][having 条件] [limit 限制]
 ```
 
 #### 1.5.1   字段表达式
@@ -313,7 +341,7 @@ mysql> select '锄禾日当午';
 +------------+
 1 row in set (0.00 sec)
 
--- 输出表达式
+-- 输出自定义表达式  （可以自定义表达式作为输出显示的自定义列值）
 mysql> select 10*10;
 +-------+
 | 10*10 |
@@ -322,7 +350,8 @@ mysql> select 10*10;
 +-------+
 1 row in set (0.00 sec)
 
-mysql> select ch,math,ch+math from stu;
+mysql> select ch,math,ch+math from stu;  // 可以自定义表达式作为输出显示的自定义列值
+
 +------+------+---------+
 | ch   | math | ch+math |
 +------+------+---------+
@@ -345,7 +374,7 @@ mysql> select rand();
 通过as给字段取别名
 
 ```mysql
-mysql> select '锄禾日当午' as '标题';   -- 取别名
+mysql> select '锄禾日当午' as '标题';   -- 取别名,值之间的as不能省略
 +------------+
 | 标题           |
 +------------+
@@ -440,7 +469,9 @@ mysql> select 10*10 as 结果 from dual;
 
 where后面跟的是条件，在数据源中进行筛选。返回条件为真记录
 
-MySQL支持的运算符
+查询原理：where是查询时候遍历数据，只要where后面的条件为真就返回出来
+
+MySQL支持的运算符，运算符之间可以组合使用
 
 ```MySQL
 -- 比较运算符
@@ -448,14 +479,14 @@ MySQL支持的运算符
 <	小于
 >=	大于等于
 <=	小于等于
-=	等于
+=	等于   （数据库中只有单等，没有双等）
 !=	不等于
 -- 逻辑运算符
 and  与
 or   或
 not  非
 -- 其他
-in | not in	 					 字段的值在枚举范围内
+in | not in	 		    字段的值在枚举范围内（sql的枚举用括号表示）
 between…and|not between…and      字段的值在数字范围内
 is null | is not null			 字段的值不为空
 ```
@@ -473,6 +504,8 @@ mysql> select * from stu where ch<60 or math<60;
 
 思考：如下语句输出什么？
 
+结合查询原理，条件是否为真
+
 ```mysql
 mysql> select * from stu where 1;		-- 输出所有数据
 mysql> select * from stu where 0;		-- 不输出数据
@@ -480,9 +513,19 @@ mysql> select * from stu where 0;		-- 不输出数据
 
 思考：如何查找北京和上海的学生
 
+- sql语句不区分大小写，所以stuaddress字段不区分大小写
+
+
 ```mysql
 -- 通过or实现
 mysql> select * from stu where stuaddress='北京' or stuaddress='上海';
++--------+----------+--------+--------+---------+------------+------+------+
+| stuNo  | stuName  | stuSex | stuAge | stuSeat | stuAddress | ch   | math |
++--------+----------+--------+--------+---------+------------+------+------+
+| s25301 | 张秋丽         | 男       |     18 |       1 | 北京           |   80 | NULL |
+| s25304 | 欧阳俊雄        | 男       |     28 |       4 | 天津           | NULL |   74 |
++--------+----------+--------+--------+---------+------------+------+------+
+2 rows in set (0.00 sec)
 
 -- 通过in语句实现
 mysql> select * from stu where stuaddress in ('北京','上海');
@@ -581,10 +624,15 @@ mysql> select * from stu where stuage between 18 and 20;
 
 #### 1.5.5  group by 【分组查询】
 
+要想学分组就得先学几个聚合函数，i详见[1.6 聚合函数]
+
 将查询的结果分组，分组查询目的在于统计数据。
+
+**单列分组**
 
 ```mysql
 -- 查询男生和女生的各自语文平均分
+-- 如果你分组查询了，前面的字段只能是1分组字段和2聚合函数
 mysql> select stusex,avg(ch) '平均分' from stu group by stusex;
 +--------+---------+
 | stusex | 平均分       |
@@ -631,13 +679,13 @@ mysql> select stuaddress,avg(math) from stu group by stuaddress;
 5 rows in set (0.00 sec)
 ```
 
-查询字段是普通字段，只取第一个值
+-- 如果你前面写了查询字段是普通字段没写分组字段，只取第一个值
 
- ![1560240652887](images/1560240652887.png)
+![alt text](image-17.png)
 
 
 
-通过group_concat()函数将同一组的值连接起来显示
+-- 通过group_concat()函数将同一组的值连接起来显示
 
 ```mysql
 mysql> select group_concat(stuname),stusex,avg(math) from stu group by stusex;
@@ -652,9 +700,10 @@ mysql> select group_concat(stuname),stusex,avg(math) from stu group by stusex;
 
 
 
-多列分组
+**多列分组**
 
 ```mysql
+// 上海的男生平均分，北京的女生，北京的男生
 mysql> select stuaddress,stusex,avg(math) from stu group by stuaddress,stusex;
 +------------+--------+-----------+
 | stuaddress | stusex | avg(math) |
@@ -714,7 +763,9 @@ select * from stu order by stuage,ch; 				#年龄升序、语文升序
 
 #### 1.5.7  having条件
 
-having：是在结果集上进行条件筛选
+having：是在结果集上进行条件筛选（where条件是在原始表里进行一条条搜索，having是结果集里进行搜索）
+
+- having是分2步的，先select XXX，拿到结果集，然后在结果集上进行条件查找
 
 例题
 
@@ -732,6 +783,7 @@ mysql> select * from stu where stusex='女';
 4 rows in set (0.00 sec)
 
 -- 查询女生
+-- having是分2步的，先select*，拿到结果集，然后在结果集上进行条件查找
 mysql> select * from stu having stusex='女';
 +--------+----------+--------+--------+---------+------------+------+------+
 | stuNo  | stuName  | stuSex | stuAge | stuSeat | stuAddress | ch   | math |
@@ -755,7 +807,7 @@ mysql> select stuname from stu where stusex='女';
 +----------+
 4 rows in set (0.00 sec)
 
--- 使用having报错，因为结果集中没有stusex字段
+-- 使用having报错，因为结果集中没有stusex字段（它是先select stuname，得到stuname的结果集，然后条件查找stuname中没有stusex字段，所以报错）
 mysql> select stuname from stu having stusex='女';
 ERROR 1054 (42S22): Unknown column 'stusex' in 'having clause'
 ```
@@ -764,11 +816,13 @@ ERROR 1054 (42S22): Unknown column 'stusex' in 'having clause'
 
 小结：having和where的区别：
 
-where是对原始数据进行筛选，having是对记录集进行筛选。 
+where是对原始数据进行筛选，having是对结果集进行筛选。 
 
 
 
 #### 1.5.8 limit
+
+取出记录的限制数量
 
 语法：limit [起始位置]，显示长度
 
@@ -870,7 +924,7 @@ mysql> select distinct stuaddress from stu;
 
 
 
-## 1.6   聚合函数
+## 1.6 聚合函数
 
 1. sum()  	   求和
 2. avg()          求平均值
@@ -880,7 +934,7 @@ mysql> select distinct stuaddress from stu;
 
 ```mysql
 # 语文最高分
-mysql> select max(ch) '语文最大值' from stu;
+mysql> select max(ch) '语文最大值' from stu; // as省略了，单引号也可以省略
 +------------+
 | 语文最大值          |
 +------------+
@@ -953,7 +1007,7 @@ mysql> select * from stu where stuname like '张%';
 
 ## 1.8  union（联合）
 
-插入测试数据
+union：就是将多个select语句联合到一起（联合select），不管是多个表或同个表
 
 ```mysql
 create table emp(
@@ -968,7 +1022,7 @@ insert into emp values (null,'争青小子',3)
 
 #### 1.8.1 union的使用
 
-作用：将多个select语句结果集纵向联合起来
+作用：将多个select语句结果集纵向联合起来，默认是去重的
 
 ```mysql
 语法：select 语句 union [选项] select 语句 union [选项] select 语句
@@ -978,7 +1032,7 @@ insert into emp values (null,'争青小子',3)
 -- 查询stu表中的姓名和emp表中姓名 结果自动合并的重复的记录
 mysql> select stuname from stu union select name from emp;
 ```
-
+![alt text](image-18.png)
 例题：查询上海的男生和北京的女生
 
 ```mysql

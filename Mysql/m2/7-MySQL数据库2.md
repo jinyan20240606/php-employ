@@ -25,7 +25,8 @@ typora-copy-images-to: images
     - [1.5.2  主表和从表](#152--主表和从表)
     - [1.5.3  外键（foreign key）](#153--外键foreign-key)
     - [1.5.4  三种外键操作](#154--三种外键操作)
-- [1.6  补充](#16--补充)
+- [1.6 插入数据时主键冲突](#16-插入数据时主键冲突)
+- [1.7  补充](#17--补充)
 
 
 ## 补充
@@ -1068,8 +1069,17 @@ create table stuscore(
 ```
 
 
+## 1.6 插入数据时主键冲突
 
-## 1.6  补充
+![alt text](image-18.png)
+
+![alt text](image-19.png)
+
+![alt text](image-20.png)
+
+![alt text](image-21.png)
+
+## 1.7  补充
 
 phpstudy中MySQL默认不是严格模式，将MySQL设置成严格模式
 
