@@ -2,7 +2,26 @@
 typora-copy-images-to: images
 ---
 
-## 1.1  今日目标
+- [1.1 今日目标](#11-今日目标)
+- [1.2 连接数据库](#12-连接数据库)
+		- [1.2.1 开启mysqli扩展](#121-开启mysqli扩展)
+		- [1.2.2 连接数据库](#122-连接数据库)
+- [1.3 操作数据](#13-操作数据)
+		- [1.3.1 数据操作语句](#131-数据操作语句)
+		- [1.3.2 数据查询语句](#132-数据查询语句)
+- [1.4 新闻模块](#14-新闻模块)
+		- [1.4.1 包含文件](#141-包含文件)
+		- [1.4.2 显示新闻](#142-显示新闻)
+		- [1.4.3 添加新闻](#143-添加新闻)
+		- [1.4.4 删除新闻](#144-删除新闻)
+		- [1.4.5 修改新闻](#145-修改新闻)
+- [1.5 数据备份与还原](#15-数据备份与还原)
+		- [1.5.1 数据备份](#151-数据备份)
+		- [1.5.2 数据还原](#152-数据还原)
+- [1.6 作业：](#16-作业)
+
+
+## 1.1 今日目标
 
 1. 理解数据备份与还原的重要性；
 2. 掌握mysqldump.exe备份方式；
@@ -17,19 +36,19 @@ typora-copy-images-to: images
 
 
 
-## 1.2   连接数据库
+## 1.2 连接数据库
 
- ![1560480407216](images/1560480407216.png)
-
-
-
-通过PHP做MySQL的客户端
+![alt text](image-1.png)
 
 
 
-#### 1.2.1  开启mysqli扩展
+通过PHP做MySQL的客户端,php默认是utf8编码。之前cmd终端下默认是gbk
 
-在php.ini中开启mysqli扩展
+
+
+#### 1.2.1 开启mysqli扩展
+
+php默认配置是链接不了数据库的，需要在php.ini中开启mysqli扩展
 
 ```
 extension=php_mysqli.dll
@@ -37,11 +56,11 @@ extension=php_mysqli.dll
 
 开启扩展后重启服务器，就可以使用mysqli_函数了，
 
- ![1560480672990](images/1560480672990.png)
+![alt text](image.png)
 
 
 
-#### 1.2.2  连接数据库
+#### 1.2.2 连接数据库
 
 **创建news数据库**
 
@@ -65,6 +84,8 @@ insert into news values (null,'草','离离原上草',unix_timestamp());
 
 
 **连接数据库**
+
+- 必须指定链接哪个数据库才行。
 
 ```php
 mysqli_connect(主机IP，用户名，密码，数据库名，端口号) //如果端口号是3306可以省略
@@ -93,13 +114,13 @@ mysqli_set_charset($link,'utf8');
 
 
 
-## 1.3  操作数据
+## 1.3 操作数据
 
-#### 1.3.1  数据操作语句
+#### 1.3.1 数据操作语句
 
 通过mysqli_query()执行SQL语句
 
-增、删、改语句执行成功返回true，失败返回false
+增、删、改语句执行成功返回true，失败返回false，查语句返回结果集
 
 ```php
 <?php
@@ -120,7 +141,7 @@ if($rs)
 /*
 $rs=mysqli_query($link,"update news set content='疑是地上霜' where id=4");
 if($rs)
-	echo '受影响的记录数是：'.mysqli_affected_rows($link);
+	echo '受影响的记录数是：'.mysqli_affected_rows($link);   已经改完了，再执行一次就是0了，无需改动
 else{
 	echo '错误码：'.mysqli_errno($link),'<br>';
 	echo '错误信息：'.mysqli_error($link);	
@@ -137,34 +158,35 @@ mysqli_query($link,"delete from news where id=5");
 ```php
 mysqli_query()：执行SQL语句
 mysqli_insert_id()：获取插入记录自动增长的ID
-mysqli_affected_rows()：获取受影响的记录数
+mysqli_affected_rows()：获取受影响的记录数   // 重复执行一次语句结果依然返回true，受影响记录数就是0了，无需改动
 mysqli_error()：获取执行SQL语句的错误信息
 mysqli_errno()：获取执行SQL语句的错误码
 ```
 
 
 
-#### 1.3.2  数据查询语句
+#### 1.3.2 数据查询语句
 
 数据查询用select、desc、show，成功会返回结果集，失败返回false
 
 ```php
 <?php
-//1、连接数据库
+//1、连接数据库 ( 注意or die语法，如果链接失败，直接输出错误信息)
 $link=@mysqli_connect('localhost','root','root','data') or die('错误信息：'.mysqli_connect_error());
 //2、设置字符编码
 mysqli_query($link,'set names utf8');
 //3、执行查询语句
 $rs=mysqli_query($link,'select * from news');
 //var_dump($rs);	//object(mysqli_result)
+
 //4、获取对象中的数据
-//4.1  将对象中的一条数据匹配成索引数组,指针下移一条
+//4.1  将对象中的一条数据返回赋值$rows成索引数组,fetch_row在$rs中的指针下移一条（用下标数字索引做索引）
 //$rows=mysqli_fetch_row($rs);
 
-//4.2  将对象中的一条数据匹配成关联数组,指针下移一条
+//4.2  将对象中的一条数据匹配成关联数组,指针下移一条（用字段做成索引）
 //$rows=mysqli_fetch_assoc($rs);
 
-//4.3  将对象中的一条数据匹配成索引，关联数组,指针下移一条
+//4.3  将对象中的一条数据匹配成索引，关联数组,指针下移一条（即有索引又有字段做成数组下标）
 //$rows=mysqli_fetch_array($rs);
 
 //4.4  总列数、总行数
@@ -173,6 +195,7 @@ $rs=mysqli_query($link,'select * from news');
 
 //4.5  获取所有数据
 //$list=mysqli_fetch_all($rs);		//默认是索引数组
+// ![alt text](image-3.png)
 //$list=mysqli_fetch_all($rs,MYSQLI_NUM);		//匹配成索引数组
 //$list=mysqli_fetch_all($rs,MYSQLI_ASSOC);		//匹配成关联数组
 $list=mysqli_fetch_all($rs,MYSQLI_BOTH);		//匹配成关联、索引数组
@@ -191,23 +214,28 @@ mysqli_close($link);
 使用的函数
 
 ```php
+@mysqli_connect：连接数据库 ( 注意or die语法，如果链接失败，直接输出错误信息)
 mysqli_fetch_assoc()：将一条数组匹配关联数组
 mysqli_fetch_row()：将一条记录匹配成索引数组
 mysqli_fetch_array()：将一条记录匹配成既有关联数组又有索引数组
+![alt text](image-2.png)
 mysqli_fetch_all()：匹配所有记录
 mysqli_num_rows()：总行数
 mysqli_num_fields()：总记录数
 mysqli_free_result()：销毁结果集
 mysqli_close()：关闭连接
 ```
+- php语法记录
+  - @：不让 MySQL 显示原始的密码错误或连接失败信息（避免暴露敏感信息）
+  - or die(...)：PHP 的短路运算特性：如果左边表达式为 false，则执行右边表达式（即 die()）
 
 
 
-## 1.4  新闻模块
+## 1.4 新闻模块
 
-#### 1.4.1  包含文件
+#### 1.4.1 包含文件
 
-由于所有的操作都要连接数据库，将连接数据库的代码存放到包含文件中
+由于所有的操作都要连接数据库，将连接数据库的代码存放到包含文件----公共文件（数据库链接模块）中
 
 步骤
 
@@ -218,6 +246,7 @@ mysqli_close()：关闭连接
 代码实现
 
 ```mysql
+// conn.php文件
 <?php
 //连接数据库
 $link=@mysqli_connect('localhost','root','root','data') or die('错误：'.mysqli_connect_error());
@@ -226,7 +255,7 @@ mysqli_set_charset($link,'utf8');
 
 
 
-#### 1.4.2  显示新闻
+#### 1.4.2 显示新闻
 
 步骤：
 
@@ -239,6 +268,7 @@ mysqli_set_charset($link,'utf8');
 代码
 
 ```php+HTML
+// list.php文件
 <style type="text/css">
 	table{
 		width:780px;
@@ -278,11 +308,11 @@ $list=mysqli_fetch_all($rs,MYSQLI_ASSOC);		//将结果匹配成关联数组
 
 运行结果 
 
-  ![1560494286358](images/1560494286358.png)
+直接访问list.php   这个url。
 
 
 
-#### 1.4.3  添加新闻
+#### 1.4.3 添加新闻
 
 步骤：
 
@@ -301,6 +331,7 @@ $list=mysqli_fetch_all($rs,MYSQLI_ASSOC);		//将结果匹配成关联数组
 代码实现
 
 ```php+HTML
+// add.php文件
 <body>
 <?php
 if(!empty($_POST)) {
@@ -334,7 +365,7 @@ if(!empty($_POST)) {
 
 
 
-#### 1.4.4  删除新闻
+#### 1.4.4 删除新闻
 
 步骤：
 
@@ -351,6 +382,7 @@ if(!empty($_POST)) {
 入口（list.php）
 
 ```php+HTML
+// 写在上面那个for循环下
 <input type="button" value="删除" onclick="if(confirm('确定要删除吗'))location.href='./del.php?id=<?php echo $rows['id']?>'">
 ```
 
@@ -372,15 +404,15 @@ else{
 
 小结：
 
-1、一个页面是否写HTML架构，取决于是否有显示功能。
-
-2、如果一个页面只是做业务逻辑，没有显示功能，就不需要写HTML架构，比如del.php页面
+1. 一个页面是否写HTML架构，取决于是否有显示功能。
+   1. 如list.php是html架构有显示功能，del.php是API开发，无显示功能
+2. 如果一个页面只是做业务逻辑，没有显示功能，就不需要写HTML架构，比如del.php页面
 
  ![1560496299270](images/1560496299270.png)
 
 
 
-#### 1.4.5  修改新闻
+#### 1.4.5 修改新闻
 
 入口（list.php）
 
@@ -398,11 +430,12 @@ edit.php页面
 
 ​	1、连接数据库
 
-​	2、获取修改的数据
+​	2、根据get请求携带的id参数，去数据库里获取修改的数据
 
 ​	3、将数据显示到表单中
+   4、用户点击提交按钮，发送post请求，触发下面的post接口[if(!empty($_POST))]
 
-第二步：执行修改逻辑
+第二步：接收post请求，执行修改逻辑
 
 ​	1、获取新数据
 
@@ -455,38 +488,48 @@ if(!empty($_POST)) {
 
 
 
-## 1.5  数据备份与还原
+## 1.5 数据备份与还原
 
-数据库中的数据需要定期备份，数据量小的可以一周备份一次，数据量的可以一天备份一次。
+数据库中的数据需要定期备份，数据量小的可以一周备份一次，数据量大的可以一天备份一次。
 
-#### 1.5.1  数据备份
+一般放在夜里备份，半夜11点12点。
+
+#### 1.5.1 数据备份
+
+mysqldump是mysql自带的逻辑备份工具。
+
+它的备份原理是，通过协议连接到mysql数据库，将需要备份的数据查询出来，将查询出的数据转换成对应的insert语句，当我们需要还原这些数据时，只要执行这些insert语句，即可将对应的数据还原。
 
 利用mysqldump工具，语法：
 
 ```
+// 默认是导表，可以加参数-B导出数据库
 mysqldump 数据库连接 数据库 > SQL文件备份地址
 ```
 
 例题：
 
 ```mysql
--- 将data数据库中所有的表导出到data.sql中
+-- 1. 导出所有表：将data数据库中所有的表导出到data.sql中（data.sql中只有创建表的代码，没有创建数据库database的代码）
 F:\wamp\PHPTutorial\MySQL\bin>mysqldump -uroot -proot data>c:\data.sql
 
--- 将data数据库中的stuinfo、stumarks表
+-- 2. 导出指定表：将data数据库中的stuinfo、stumarks表指定导出
 F:\wamp\PHPTutorial\MySQL\bin>mysqldump -uroot -proot data stuinfo stumarks>c:\data.sql
 
--- 导出data数据库，导出的语句中带有创建数据库的语法
+-- 3. 导出data数据库：导出的语句中带有创建数据库的语法
 F:\wamp\PHPTutorial\MySQL\bin>mysqldump -uroot -proot -B data>c:\data1.sql
 ```
 
-#### 1.5.2  数据还原
+#### 1.5.2 数据还原
 
 方法一：MySQL的source指令（需要登录MySQL才能使用）
 
 ```mysql
+mysql> create database data;
+mysql> use data;  // 先进入data数据库，才能用数据表的还原，还原到当前数据库里
 mysql> source c:/data.sql;
 注意：地址分隔符用斜线，不能用反斜线
+mysql> show tables; // 就可以看到还原的表了
 ```
 
 方法二：通过mysql指令数据还原（不需要登录MySQL）
@@ -505,7 +548,7 @@ F:\wamp\PHPTutorial\MySQL\bin>mysql -uroot -proot data1 < c:\data.sql
 
 
 
-## 1.6  作业：
+## 1.6 作业：
 
 1、通过循环的方式获取表中的所有记录
 
