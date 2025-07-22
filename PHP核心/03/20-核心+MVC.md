@@ -2,6 +2,29 @@
 typora-copy-images-to: images
 ---
 
+- [1.1  今日目标](#11--今日目标)
+- [1.2  开启GD扩展](#12--开启gd扩展)
+- [1.3  创建最简单的图片](#13--创建最简单的图片)
+- [1.4  填充颜色](#14--填充颜色)
+- [1.5  验证码](#15--验证码)
+    - [1.5.1  验证码的作用](#151--验证码的作用)
+    - [1.5.2  原理](#152--原理)
+    - [1.5.3  代码实现](#153--代码实现)
+- [1.6  打开图片创建验证码](#16--打开图片创建验证码)
+- [1.7  中文验证码](#17--中文验证码)
+    - [1.7.1  步骤与思考](#171--步骤与思考)
+    - [1.7.2  代码实现](#172--代码实现)
+- [1.8  水印](#18--水印)
+    - [1.8.1  文字水印](#181--文字水印)
+    - [1.8.2  图片水印](#182--图片水印)
+- [1.9  缩略图](#19--缩略图)
+- [1.10 验证码改错](#110-验证码改错)
+- [1.11 在项目中实现验证码](#111-在项目中实现验证码)
+    - [1.11.1  封装验证码类](#1111--封装验证码类)
+    - [1.11.2  使用验证码](#1112--使用验证码)
+- [1.12 使用的函数](#112-使用的函数)
+
+
 ## 1.1  今日目标
 
 1. 理解PHP扩展的加载；
@@ -17,14 +40,20 @@ typora-copy-images-to: images
 
 GD库是用来处理图片的。使用GD库，首先在php.ini中开启gd扩展
 
+只要是处理图片的函数都是在gd库里扩展的。
+
+
 ```
 extension=php_gd2.dll
 ```
 
 开启以后就可以使用image开头的函数了。
 
- ![1561860012762](images/1561860012762.png)
+![alt text](image.png)
 
+- 项目应用
+  - 验证码
+  - 上传头像显示缩略图
 
 
 ## 1.3  创建最简单的图片
@@ -42,12 +71,13 @@ extension=php_gd2.dll
 $img=imagecreate(200,100);	//创建图片
 //var_dump($img);		//resource(2) of type (gd) 
 imagecolorallocate($img,255,0,0);	//给图片分配第一个颜色,默认是背景色
+imagecolorallocate($img,255,0,0);	//第二次不会生效，只生效第一个
 //操作一：显示图片
 /*
-//告知浏览器用jpg格式显示
+//告知浏览器用jpg格式显示-----> 如果不告诉，浏览器默认显示一堆乱码
 header('content-type:image/jpeg');
 //显示图片
-imagejpeg($img);	//用jpg格式显示图片
+imagejpeg($img);	//用jpg格式显示图片，默认是一个黑背景
 */
 
 //操作二：保存图片（不需要设置header头）
@@ -78,9 +108,9 @@ imagegif()：将图片输出为gif格式
 ```php
 <?php
 $img=imagecreate(200,100);	//创建图片资源
-$color=imagecolorallocate($img,200,200,200);
+$color=imagecolorallocate($img,200,200,200); // 返回的是颜色的索引编号
 //更改背景色
-switch(rand(1,100)%3) {
+switch(rand(1,100)%3) {// 随机数模3,余数为0,1,2
 	case 0:
 		$color=imagecolorallocate($img,255,0,0);	//颜色的索引编号
 		break;
@@ -101,11 +131,13 @@ imagepng($img);
 
 ## 1.5  验证码
 
+讲gd库来做验证码
+
 #### 1.5.1  验证码的作用
 
 防止暴力破解
 
- ![](images/1554085997276.png)
+![alt text](image-1.png)
 
 
 
@@ -177,7 +209,7 @@ imagegif($img);
 
 运行结果
 
-  ![1561865421771](images/1561865421771.png)
+![alt text](image-2.png)
 
 
 
@@ -195,7 +227,7 @@ imagegif($img);
 
 ```php
 <?php
-//第一步：生成随机字符串
+//第一步：生成随机字符串 --- 是直接写好基本字符串集合，不用上面的随机生成
 $codeSet='2345678abcdefhijkmnpqrstuvwxyzABCDEFGHJKLMNPQRTUVWXY';
 $code='';
 $max=strlen($codeSet);
@@ -212,7 +244,7 @@ $x=(imagesx($img)-imagefontwidth($font)*strlen($code))/2;
 $y=(imagesy($img)-imagefontheight($font))/2;
 //随机前景色
 $color=imagecolorallocate($img,255,255,255);	//设置背景色
-if(rand(1,100)%2)
+if(rand(1,100)%2) // 随机数模2,余数为0,1
 	$color=imagecolorallocate($img,255,0,0);	//设置背景色	
 
 imagestring($img,$font,$x,$y,$code,$color);
@@ -223,13 +255,13 @@ imagegif($img);
 
 运行结果
 
- ![1561866597287](images/1561866597287.png)
+![alt text](image-3.png)
 
 
 
-多学一招：captcha
+多学一招：captcha就是全自动区分机器和人的一个领域项目（图灵就是图片的意思）
 
- ![1561866719344](images/1561866719344.png)
+![alt text](image-4.png)
 
 
 
@@ -239,7 +271,7 @@ imagegif($img);
 
 思考
 
-1、中文验证码需要引入字体文件，内置字体不支持中文
+1、中文验证码需要引入字体文件，imagestring的内置字体不支持中文
 
 2、使用`imagettftext(图片资源,字号大小,角度,起始x坐标,起始y坐标,颜色,字体文件地址,字符串)`写入中文
 
@@ -269,6 +301,12 @@ imagegif($img);
 <?php
 //第一步：生成随机字符串
 $codeSet='们以我到他会作时要动国产的一是工就年阶义发成部民可出能方进在了不和有大这主中人上为来';
+
+// START：注意点：需要使用mb_substr()函数进行对汉字多字节处理
+echo $codeSet[0]; // 并不是们，而是输出空。因为它是输出第0个字节，一个汉字占3个字节呢   --- 与js不同，js是按字符进行截取的
+echo substr($codeSet,0,1); // 这还是为空，它也是按字节进行截的。
+// END
+
 $max=mb_strlen($codeSet)-1;	//中文字符的最大索引号
 $code='';
 for($i=0; $i<4; $i++) {
@@ -284,13 +322,14 @@ $color=imagecolorallocate($img,255,255,255);
 $size=15;	//字号
 $angle=0;	//角度
 $fontfile='./ttf/simhei.ttf';	//字体路径
-//3.2 测定字符串的范围
+//3.2 测定字符串的范围：imagefontwidth函数只能内置字体的宽度，不能测定外部字体的宽度需要使用imagettfbbox
 $info=imagettfbbox($size,$angle,$fontfile,$code);
-$code_w=$info[4]-$info[6];	//字符串的宽度
+$code_w=$info[4]-$info[6];	//字符串的宽度，4-6，2-0都行
 $code_h=$info[1]-$info[7];	//字符串的高度
 
+// （图片的总高度-字符串的总高度）/2 并没有居中。取决于中文的打印方式有问题，汉字的底下有个基线，打字必须在基线上方一段距离处对齐着打字（不同的字体它的基线位置还不一样）
 $x=(imagesx($img)-$code_w)/2;	//起始点的$x
-$y=(imagesy($img)+$code_h)/2;	//起始点的$y
+$y=(imagesy($img)+$code_h)/2;	//起始点的$y：这块记得使用+号
 //3.3  将中文字符串写到画布上
 imagettftext($img,$size,$angle,$x,$y,$color,$fontfile,$code);	//将文字写到画布上
 //显示验证码
@@ -300,9 +339,9 @@ imagejpeg($img);
 
 小结
 
-1、中文处理需要使用多字节处理
+1、中文处理需要使用多字节处理，与js不同，js默认字符串函数是自动区分中文进行截取的
 
-2、使用多字节处理函数需要开启相应的扩展
+2、使用多字节处理函数需要开启相应的扩展   --- 开启后就可以使用mb开头的函数如mb_substr进行汉字截取
 
 ```
 extension=php_mbstring.dll
@@ -310,19 +349,23 @@ extension=php_mbstring.dll
 
 3、使用`imagettfbbox` 测定中文字符串的范围
 
+![alt text](image-6.png)
+
 4、使用`imagettftext`将中文写到画布上
+
+![alt text](image-5.png)
 
 
 
 ## 1.8  水印
 
-  ![](images/1554103274190.png)
+![alt text](image-7.png)
 
 ####  1.8.1  文字水印
 
 1. 在图片上添加文字或图片，目的：宣传，防止盗图
 2. 水印有文字水印和图片水印.
-3. 文字水印实现原理和中文验证码是一样的
+3. 文字水印实现原理和中文验证码是一样的，都是打开一个图，给上面写点字
 
  步骤
 
@@ -359,7 +402,7 @@ imagejpeg($img,'./face.jpg');
 
 实现效果
 
-  ![1561879059110](images/1561879059110.png)
+![alt text](image-8.png)
 
 
 
@@ -388,6 +431,7 @@ $dst_x=imagesx($dst_img)-imagesx($src_img);   //开始粘贴的x
 $dst_y=imagesy($dst_img)-imagesy($src_img);	  //开始粘贴的y
 $src_w=imagesx($src_img);
 $src_h=imagesy($src_img);
+// 将源图复制粘到目标图上，水印效果
 imagecopy($dst_img,$src_img,$dst_x,$dst_y,0,0,$src_w,$src_h);
 //显示水印图
 header('content-type:image/jpeg');
@@ -425,6 +469,7 @@ $src_img=imagecreatefromjpeg('./face.jpg');
 //第三步：复制源图拷贝到目标图上，并缩放大小
 $src_w=imagesx($src_img);
 $src_h=imagesy($src_img);
+// 拷贝完后再缩放大小，拷贝到目标图上
 imagecopyresampled($dst_img,$src_img,0,0,0,0,200,200,$src_w,$src_h);
 //第四步：保存缩略图
 //header('content-type:image/jpeg');
@@ -435,20 +480,21 @@ imagejpeg($dst_img,'./face1.jpg');
 
 ```
 imagecreate()：创建支持256种颜色的画布
-imagecreatetruecolor()：创建真彩色画布，支持256*256*256种颜色
+imagecreatetruecolor()：创建真彩色画布，支持256*256*256种颜色，1600多万种颜色
+imagecopyresampled：复制并缩放
 ```
 
 
 
 ## 1.10 验证码改错
 
-验证码错误不会报具体的错误信息
+验证码显示错误不会报具体的错误信息，如打个x号，图片显示不出来
 
- ![1561882436203](images/1561882436203.png)
+![alt text](image-9.png)
 
 第一招：注释header
 
- ![1561882480075](images/1561882480075.png)
+![alt text](image-10.png)
 
 注释掉header后，错误信息就出来了
 
@@ -456,21 +502,21 @@ imagecreatetruecolor()：创建真彩色画布，支持256*256*256种颜色
 
 
 
-第二招：如果没有报错，就留心一下图片代码前有无字符串输出，图片前面是不允许有任何字符串输出的
+第二招：如果没有报错，就留心一下图片代码前有无字符串输出，图片前面是不允许有任何字符串输出的，空白字符也不能有。
 
- ![1561882678912](images/1561882678912.png)
+![alt text](image-11.png)
 
 
 
 第三招：查看源码，图片代码前是否有空白字符
 
- ![1561882869099](images/1561882869099.png)
+![alt text](image-12.png)
 
 
 
-第四招：如果上面的三招无效，在header()前添加ob_clean();
+第四招：如果上面的三招无效，在header()前添加ob_clean();---能自动清除缓冲区的内容，包括空格、换行符、制表符等。
 
- ![1561883088298](images/1561883088298.png)
+![alt text](image-13.png)
 
 
 
@@ -497,13 +543,13 @@ class Captcha{
         $all_array=array_merge(range('a','z'),range('A','Z'),range(0,9));	//所有字符数组
         $div_array=['1','l','0','o','O','I'];	//去除容易混淆的字符
         $array=array_diff($all_array,$div_array);	//剩余的字符数组
-        unset($all_array,$div_array);		//销毁不需要使用的数组
+        unset($all_array,$div_array);		//立即销毁不需要使用的数组，--而不是等垃圾自动回收
         $index=array_rand($array,4);	//随机取4个字符,返回字符下标，按先后顺序排列
         shuffle($index);	//打乱字符
         $code='';
         foreach($index as $i)
             $code.=$array[$i];
-        $_SESSION['code']=$code;        //保存到会话中
+        $_SESSION['code']=$code;        //保存到session会话中
         return $code;
     }
     //创建验证码
@@ -522,6 +568,7 @@ class Captcha{
     }
     //验证码比较
     public function check($code){
+        //  strtoupper：将 $code 字符串转换为全大写
         return strtoupper($code)== strtoupper($_SESSION['code']);
     }
 }
