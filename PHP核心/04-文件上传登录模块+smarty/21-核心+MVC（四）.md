@@ -2,6 +2,29 @@
 typora-copy-images-to: images
 ---
 
+- [1.1  今日目标](#11--今日目标)
+- [1.2  文件上传](#12--文件上传)
+    - [1.2.1  封装文件上传类](#121--封装文件上传类)
+    - [1.2.2  封装缩略图类](#122--封装缩略图类)
+  - [1.2.3  实现文件上传](#123--实现文件上传)
+- [1.3  登录模块](#13--登录模块)
+    - [1.3.1  记住密码](#131--记住密码)
+    - [1.3.2  安全退出](#132--安全退出)
+- [1.4  Smarty简介](#14--smarty简介)
+    - [1.4.1  Smarty的引入](#141--smarty的引入)
+    - [1.2.2  Smarty介绍](#122--smarty介绍)
+- [1.5  自定义Smarty-(学习原理)](#15--自定义smarty-学习原理)
+    - [1.3.1  演化一:（smarty生成混编文件）](#131--演化一smarty生成混编文件)
+    - [1.3.2  演化二：（smarty封装）](#132--演化二smarty封装)
+    - [1.3.3  演化三：（有条件的生成混编文件）](#133--演化三有条件的生成混编文件)
+    - [1.3.4  演化四：文件分类存放](#134--演化四文件分类存放)
+    - [1.3.5 演化五：封装编译方法](#135-演化五封装编译方法)
+- [1.6  官方Smarty介绍](#16--官方smarty介绍)
+    - [1.6.1 smarty目录结构](#161-smarty目录结构)
+    - [1.6.2  smarty简单的操作](#162--smarty简单的操作)
+    - [1.6.3  注释](#163--注释)
+
+
 ## 1.1  今日目标
 
 1. 更好的理解类的封装特性；
@@ -88,7 +111,7 @@ class Upload{
                     return false;
             }
         }
-        //2、验证格式
+        //2、验证格式：防止伪造格式
 	$info=finfo_open(FILEINFO_MIME_TYPE);
 	$mime=finfo_file($info,$files['tmp_name']);
 	if(!in_array($mime, $this->type)){
@@ -132,9 +155,9 @@ class Image{
         imagecopyresampled($dst_img,$src_img,0,0,0,0,$w,$h,$src_w,$src_h);
         $filename=basename($src_path);  //文件名
         $foldername=substr(dirname($src_path),-10); //目录名
-        $save_path= dirname($src_path).'/'.$prefix.$filename;
+        $save_path= dirname($src_path).'/'.$prefix.$filename; // 服务器保存的路径
         imagejpeg($dst_img,$save_path);
-        return "{$foldername}/{$prefix}{$filename}";
+        return "{$foldername}/{$prefix}{$filename}"; // 返回的路径
     }
 }
 ```
@@ -187,15 +210,17 @@ public function registerAction(){
 
 #### 1.3.1  记住密码
 
-登录成功后，如果需要记录用户名和密码，则将用户名和密码记录在cookie中
+在loginController即登录页面控制器中判断：
 
-  ![1561951991167](images/1561951991167.png)
+1. 登录成功后，如果需要记录用户名和密码，则将用户名和密码记录在cookie中
+
+![alt text](image.png)
 
 
 
-打开登录页面的时候，获取cookie的值
+2. 打开登录页面的时候，获取cookie的值
 
- ![1561952025351](images/1561952025351.png)
+![alt text](image-1.png)
 
 在视图页面（login.html）页面显示cookie的信息
 
@@ -215,8 +240,8 @@ public function registerAction(){
 
 #### 1.3.2  安全退出
 
-退出：退出的时候不销毁令牌
-安全退出：退出的时候销毁了令牌
+退出：退出的时候不销毁session令牌，再进入时不需要再登录了
+安全退出：退出的时候销毁了session令牌，再进入网站时需要重新输入用户名密码进行登录
 
 top.html
 
@@ -226,7 +251,7 @@ top.html
 _top：表示在最顶端的窗口中打开
 ```
 
-控制器（LoginController）
+控制器（LoginController）：// 安全退出应该写在登录控制器里
 
 ```php
 public function logoutAction(){
@@ -241,24 +266,19 @@ public function logoutAction(){
 
 #### 1.4.1  Smarty的引入
 
-1、为了分工合作，模板页面中最好不要出现PHP的代码。
+1、为了分工合作，模板html页面中最好不要出现PHP的代码。
 
-2、需要将表现和内容相分离
+2、需要将表现和内容相分离：把php代码和html代码完全分开，促成前后端分离
 
 #### 1.2.2  Smarty介绍
 
- ![1561953188908](images/1561953188908.png)
-
-
-
-## 1.5  自定义Smarty
+## 1.5  自定义Smarty-(学习原理)
 
 #### 1.3.1  演化一:（smarty生成混编文件）
 
 在模板中不能出现PHP定界符，标准写法如下：
 
-1、html代码
-
+1、html代码：1-demo.html
 ```html
 <body>
 {$title}
@@ -275,7 +295,7 @@ public function logoutAction(){
 
 运行结果
 
-  ![1561962161195](images/1561962161195.png)
+![alt text](image-2.png)
 
 不能解析的原因是：PHP不能识别 { 和 } 
 
@@ -283,7 +303,7 @@ public function logoutAction(){
 
 将大括号替换成PHP的定界符
 
-  ![1561962261095](images/1561962261095.png)
+![alt text](image-3.png)
 
 
 
@@ -295,6 +315,7 @@ $title='锄禾';
 $str=file_get_contents('./index.html');
 $str=str_replace('{','<?php echo ',$str);	//替换左大括号
 $str=str_replace('}',';?>',$str);			//替换右大括号
+// 
 file_put_contents('./index.html.php', $str);	//写入混编文件
 require './index.html.php';	//包含混编文件
 ```
@@ -396,6 +417,8 @@ class Smarty{
 
 小结：
 
+filemtime($tpl)：修改时间
+
 生成混编文件的条件
 
 1、混编不存在
@@ -471,10 +494,12 @@ smarty.class.php
 class Smarty{
 	...
 	public function display($tpl){
+        // ... 将来还会有缓存逻辑：缓存详情见同级05目录(## 1.10  缓存)
+        // 比如 compile编译后的文件是混编文件，需要php再执行一遍的（把变量换成具体值），在这里可以直接执行生成html文件，存到缓存里，直接返回html文件内容，缓存混编到html的逻辑
 		require $this->compile($tpl);
 	}
 	/*
-	*作用：编译模板
+	*作用：编译模板-----核心方法如compile一般不让直接调用，只能通过公共的display方法调用
 	*@param $tpl string 模板的名字
 	*/
 	private function compile($tpl){
@@ -510,17 +535,13 @@ $smarty->display('index.html');	//传递文件名
 
 到`www.smarty.net`网站下载最新的smarty版本
 
- ![1561967552187](images/1561967552187.png)
+![alt text](image-4.png)
 
 解压
 
- ![1561967604487](images/1561967604487.png)
-
-
-
 libs目录结构
 
-  ![1561967720685](images/1561967720685.png)
+![alt text](image-5.png)
 
 
 
@@ -582,7 +603,7 @@ $smarty->display('1-demo.html');
 	{{$title}}
 </body>
 ```
-
+![alt text](image-6.png)
 
 
 #### 1.6.3  注释
