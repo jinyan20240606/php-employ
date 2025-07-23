@@ -11,6 +11,7 @@
         
         <!-- edit form -->
         <form action="{:url('admin/goods/update')}" method="post" id="tab" enctype="multipart/form-data">
+            <!-- 隐藏域：保存当前商品记录的主键id值 -->
             <input type="hidden" name="id" value="{$goods.id}">
             <ul class="nav nav-tabs">
               <li role="presentation" class="active"><a href="#basic" data-toggle="tab">基本信息</a></li>
