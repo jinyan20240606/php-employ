@@ -9,7 +9,7 @@ class Login extends Controller
     //登录
     public function login()
     {
-        //临时关闭全局模板布局
+        //临时关闭全局模板布局：对登录页不开启公共模板布局
         $this->view->engine->layout(false);
         return view();
     }

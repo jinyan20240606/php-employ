@@ -28,12 +28,14 @@ class Test extends Controller
         $data = \app\admin\model\Goods::select('32,33,34');
         $data = \app\admin\model\Goods::select([32,33,34]);*/
         //dump($data);die;
-        /*foreach($data as $v){
+        foreach($data as $v){
             //输出商品名称 goods_name
             //dump($v->goods_name);
-            dump($v['goods_name']);
+            // dump($v->getData()); // 获取原始数据关联数组格式
+            // dump($v->getTable()); // 获取当前表名
+            dump($v->toArray()); // 转换为数组
         }
-        die;*/
+        die;
         //返回结果  外层是数组，里面是对象
         //为了打印查看数据方便，可以将返回的结果 转化为标准的二维数组
         //1 foreach
@@ -73,6 +75,7 @@ class Test extends Controller
      */
     public function save(Request $request)
     {
+        // 十三：查询方法where重点使用：
         //where方法使用
         //$goods = \app\admin\model\Goods::where('id', '=', 33)->find();
         //$goods = \app\admin\model\Goods::where('id', 33)->find();
@@ -99,13 +102,14 @@ class Test extends Controller
 //        $count = \app\admin\model\Goods::where('id', '>', 35)->count();
 //        dump($count);
 
-        //字段值查询
+        // 字段值查询
+        // 单条记录
         /*$goods_name = \app\admin\model\Goods::where('id', 33)->value('goods_name');
         dump($goods_name);
-
+        // 多条记录
         $goods_names = \app\admin\model\Goods::where('id','>', 35)->column('goods_name');
         dump($goods_names);
-
+        // 多条记录，以id字段值作为数组索引
         $goods_names = \app\admin\model\Goods::where('id','>', 35)->column('goods_name', 'id');
         dump($goods_names);*/
 
@@ -138,7 +142,8 @@ class Test extends Controller
      */
     public function read($id)
     {
-        //查询一条数据
+        // 查询一条数据
+        // 取出主键为32的
         $goods = \app\admin\model\Goods::find(32);
         //$goods = \app\admin\model\Goods::get(33);
 //        dump($goods);
@@ -150,6 +155,7 @@ class Test extends Controller
         dump($goods['goods_name']);
         //dump($goods->goods_name); 会报错
         die;
+        return view('read', ['goods' => $goods]);
     }
 
     /**

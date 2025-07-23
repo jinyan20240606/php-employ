@@ -185,7 +185,7 @@ apache配置参考（不要照搬）：
 19.│  ├─static             静态资源存放目录(css,js,image)
 20.│  ├─index.php          应用入口文件
 21.│  ├─router.php         快速测试文件
-22.│  └─.htaccess          用于 apache 的重写
+22.│  └─.htaccess          用于 apache 的重写：apache的补充配置文件
 23.├─runtime               应用的运行时目录（可写，可设置）
 24.├─vendor                第三方类库目录（Composer）
 25.├─thinkphp              框架系统目录
@@ -194,7 +194,7 @@ apache配置参考（不要照搬）：
 28.│  │  ├─think           Think 类库包目录
 29.│  │  └─traits          系统 Traits 目录
 30.│  ├─tpl                系统模板目录
-31.│  ├─.htaccess          用于 apache 的重写
+31.│  ├─.htaccess          用于 apache 的重写：apache的补充配置文件
 32.│  ├─.travis.yml        CI 定义文件
 33.│  ├─base.php           基础定义文件
 34.│  ├─composer.json      composer 定义文件
@@ -348,13 +348,13 @@ ThinkPHP5.0框架中，默认使用PATH_INFO方式的url进行访问。
 
 示例：[http://www.tpshop.com/index.php/Index/Test/index/page/10](http://www.tpshop.com/index.php/Home/Test/index/page/10)
 
-格式：[http://域名/入口文件/模块名/控制器名称/操作方法名称/参数名/参数值](http://域名/入口文件?m=分组名&c=控制器名称&a=操作方法名称&参数名=参数值)
+格式：[http://域名/入口文件/模块名/控制器名称/操作方法名称/参数名/参数值]：http://域名/入口文件?m=分组名&c=控制器名称&a=操作方法名称&参数名=参数值)
 
  
 
-隐藏入口文件写法：[http://域名/模块名/控制器名称/操作方法名称/参数名/参数值](http://域名/入口文件?m=分组名&c=控制器名称&a=操作方法名称&参数名=参数值)
+隐藏入口文件写法：[http://域名/模块名/控制器名称/操作方法名称/参数名/参数值]：http://域名/入口文件?m=分组名&c=控制器名称&a=操作方法名称&参数名=参数值)(把入口文件去掉了/index.php)
 
-需要对apache进行设置（手册--架构--URL访问、手册--部署--URL重写）
+想要支持隐藏入口文件写法：需要对apache进行设置（手册--架构--URL访问、手册--部署--URL重写）
 
 ![img](img/wps6370.tmp.jpg ) 
 
@@ -473,6 +473,8 @@ php think make:model 模块名/模型名
 
 # 七、Request请求类
 
+3种方式获取Request对象及其参数
+
 ## 1、获取输入变量
 
 （见手册--请求--输入变量）
@@ -552,9 +554,13 @@ route方法 只能获取到?前面的路由中的参数（id）
 
 ![1562229323006](img/1562229323006.png)
 
-原理分析：
+设计模式原理分析：
+
+- 左图就是普通写法就是耦合严重存在硬编码，依赖注入抽象的思想就是把不同策略类作为外部的参数动态调用，不硬编码，灵活性高---就是右图。
 
 ![1562229272862](img/1562229272862.png)
+
+
 
 补充说明：Request请求类中，封装了很多和请求相关的方法，详情见手册--请求（多看）
 
@@ -597,7 +603,9 @@ HTML模板文件
 
 默认的视图目录是模块的view目录，框架的默认视图文件后缀是.html。
 
- 
+文件命名规则多个单词时：下划线命名法
+
+ ![alt text](image.png)
 
 比如home模块 Index控制器index方法要调用的模板定义为view/index/index.html
 

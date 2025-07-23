@@ -5,5 +5,5 @@ return [
         'layout_on' => true, //开启全局模板布局
         // 'layout_name' => 'layout' //布局文件名称
 
-    ]
+    ],
 ];
