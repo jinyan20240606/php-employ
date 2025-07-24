@@ -477,15 +477,18 @@ Database changed
 
 ```
 create table [if not exists] `表名`(
-    `字段名` 数据类型 [null|not null] [default] [auto_increment] [primary key] [comment],
+    `字段名` 数据类型 [unsigned] [null|not null] [default] [auto_increment] [primary key] [comment] ...,
     `字段名 数据类型 …
 )[engine=存储引擎] [charset=字符编码]
 
 null|not null     是否为空
+unsigned          无符号
 default:          默认值
 auto_increment    自动增长,默认从1开始，每次递增1
 primary key       主键，主键的值不能重复，不能为空,每个表必须只能有一个主键
 comment:          备注
+ON UPDATE CURRENT_TIMESTAMP：用在 DATETIME 或 TIMESTAMP 类型的字段定义中，更新时自动设置为当前时间
+
 engine            引擎决定了数据的存储和查找的一个方式   myisam、innodb、memory、csv、json、archive、
 
 脚下留心：表名和字段名如果用了关键字，要用反引号引起来。

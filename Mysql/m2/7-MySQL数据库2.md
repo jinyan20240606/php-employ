@@ -441,6 +441,17 @@ Query OK, 1 row affected (0.00 sec)
 | year      | 年份，占用1个字节     |
 | timestamp | 时间戳，占用4个字节   |
 
+0、数据类型额外支持的语法
+
+datetime和timestamp这两个类型额外支持 DEFAULT CURRENT_TIMESTAMP 和 ON UPDATE CURRENT_TIMESTAMP 语法，用于自动设置字段值为当前时间戳（创建时或更新时）
+```
+CREATE TABLE example (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+```
+
 1、datetime和date
 
 datetime格式：年-月-日  小时:分钟:秒。支持的范围是'1000-01-01 00:00:00'到'9999-12-31 

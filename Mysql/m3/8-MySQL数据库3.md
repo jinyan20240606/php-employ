@@ -57,7 +57,11 @@ typora-copy-images-to: images
 4大关系
 ![alt text](image.png)
 
-
+- 类比班级学生表例子：对1就1个学生，对多就多个学生，
+  - 1对多：1个班级有多个学生，但是每个学生只能分配给一个班级
+  - 多对1：1个班级只有1个学生，每个学生可以分配到多个班级
+  - 1对1： 1个班级只有1个学生，1个学生只能分配1个班级
+  - 多对多：1个班级有多个学生，每个学生也可以分配到多个班级
 
 #### 1.2.1  一对多（1：N）
 
@@ -69,16 +73,29 @@ typora-copy-images-to: images
 
 必须是从表非主键，因为从表的主键不能重复，必须是其他字段作主键，该非主键字段可以重复，达成1对多关系
 
+例子：authors 表和 books 表。他俩有没有关联关系，每个作者可以写多本书，但每本书只能有一个作者，有1对多关系。
+
+```sql
+-- 主表
+CREATE TABLE authors (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100)
+);
+-- 从表
+CREATE TABLE books (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100),
+    author_id INT,    // 这个外键就不能做主键，因为书本表中多本书可能会存在同1个的作者，否则就主键重复
+    FOREIGN KEY (author_id) REFERENCES authors(id)
+);
+-- 从表 books 中，author_id 字段引用了主表 authors 中的 id 字段，这就建立了它们之间的关系。
+```
 
 问题：说出几个一对多的关系？
 
-如班级表里1个班级，对应从表学生表内，2个学生记录的班级号都是一样的，就是2个学生对应一个班级
+如班级表里1个班级，对应从表学生表内 ------> 1个班级有多个学生，但是每个学生只能分配给一个班级
 
-```
-班主任表——学生表
-品牌表——商品表
-老师-学生：多对多，学生可以选多个老师，老师可以选多个学生
-```
+- 判断1对多的口诀：类比班级表例子，1个班级有多个学生，但是每个学生只能分配给一个班级
 
 
 
@@ -95,6 +112,21 @@ typora-copy-images-to: images
 
 
 如何实现一对一：主键和主键建关系
+
+```sql
+-- 主表
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50)
+);
+-- 从表
+CREATE TABLE profiles (
+    user_id INT PRIMARY KEY,
+    bio TEXT,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+-- profiles 是一个独立表，但它通过 user_id 外键即主键与 users 表主键相关联
+```
 
 思考：一对一两个表完全可以用一个表实现，为什么还要分成两个表？
 
@@ -116,7 +148,30 @@ typora-copy-images-to: images
 第三张表含多个重复的班级和讲师
 
 
-如何实现多对多：利用第三张关系表
+如何实现多对多：需要增加个第三者关联表，表明关系即上图的利用第三张关系表
+
+例子：students 表和 courses 表。每个学生可以选择多门课程，每门课程也可以被多个学生选择。这种情况下需要一个关联表 enrollments
+```sql
+-- 主表
+CREATE TABLE students (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100)
+);
+
+-- 从表
+CREATE TABLE courses (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100)
+);
+-- 第三者：关联表
+CREATE TABLE enrollments (
+    student_id INT,
+    course_id INT,
+    PRIMARY KEY (student_id, course_id), -- 联合主键
+    FOREIGN KEY (student_id) REFERENCES students(id),
+    FOREIGN KEY (course_id) REFERENCES courses(id)
+);
+```
 
 问题：说出几个多对多的关系？
 

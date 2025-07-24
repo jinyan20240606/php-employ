@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="/static/admin/js/jquery-1.8.1.min.js"></script>
+</head>
+<body>
+<input type="button" value="发送请求" id="btn">
+<script>
+    $(function(){
+        //点击按钮 发送ajax
+        $('#btn').click(function(){
+            $.ajax({
+                "url":"http://www.tpshop.com/admin/api/index",
+                "type":"get",
+                "data":"page=1",
+                "dataType":"json",
+                "success":function(res){
+
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
