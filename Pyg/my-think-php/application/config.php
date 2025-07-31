@@ -262,8 +262,6 @@ return [
 
     //ping++聚合支付
     'pingpp' => [
-        'api_key' => '',//test_key 或 live_key
-        'app_id' => '',// 应用app_id
-        'private_key_path' => './pingpp_rsa_private_key.pem' //商户私钥文件路径
+        // 该配置数组内容安全问题,删除了。。。
     ],
 ];
