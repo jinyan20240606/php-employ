@@ -259,6 +259,13 @@ $list = [
 
 **如果你嫌麻烦代码过多,可以用下面章节是框架的模型提供了关联语句可以方便查**
 
+- ThinkPHP 支持多种模型关联方式，比如：
+  - hasOne（一对一
+  - belongsTo（反向一对一）
+  - hasMany（一对多）
+  - belongsToMany（多对多）
+  - 嵌套关联: 就是在这些基础上，继续加载关联模型中的关联。
+
 ## 2、一对一关联
 
 新增管理员档案表pyg_profile，保存每个管理员的详细信息(身份证号、银行卡号)。
@@ -312,6 +319,7 @@ php think make:model common/Profile
 
 ```php
 //定义管理员-档案关联关系
+// 当前管理员表中
 public function profile()
 {
 	return $this->hasOne('Profile', 'uid', 'id');
@@ -342,8 +350,29 @@ return $this->hasOne(关联model，关联model的联系键，本model的联系�
 ```php
 $info = \app\common\model\Admin::with('profile')->find(1);
 dump($info);
+// object(app\common\model\Admin) {
+//    'id' => 1,
+//    'username' => 'admin',
+//    'password' => '********',
+//    'status' => 1,
+//    'profile' => object(app\common\model\Profile) {
+//        'id' => 1,
+//        'admin_id' => 1,
+//        'realname' => '张三',
+//        'gender' => '男',
+//        'age' => 28
+//     }
+// }
 $data = \app\common\model\Admin::with('profile')->select();
 dump($data);
+
+// with('profile') 是 ThinkPHP 的 预载入关联（Eager Loading），用于避免 N+1 查询问题。它会在查询 admin 表的同时，把对应的 profile 数据也查出来，避免在循环中多次查询数据库。
+
+// Bind处理: 让 profile 的字段直接出现在 Admin 对象上（如 $admin->realname），你可以使用 bind()
+public function profile()
+{
+    return $this->hasOne('Profile')->bind(['realname', 'gender']);
+}
 ```
 
 
@@ -410,6 +439,7 @@ dump($data);
 
 ```php
 //定义分类-品牌关联关系
+// 当前分类表中定义
 public function brands()
 {
 	return $this->hasMany('Brand', 'cate_id', 'id');
@@ -490,15 +520,25 @@ dump($data);
 
 hasOne() 和belongsTo方法后面，调用bind方法，可将属性绑定到父模型中。
 
-注：hasMany方法后不能调用bind方法。
+- hasOne用在1对多的主表中:分类表
+- belongsTo用在1对多的从表中:品牌表
+
+注：hasMany方法后不能调用bind方法,因为hasMany返回的是一个集合,集合中的每个元素都是一个对象,对象中包含了完整的分类记录,所以不能扁平化的直接绑定到1维对象里去。
 
 比如,品牌模型中：将分类名称cate_name绑定到品牌模型数据中
 
 ```php
-public function category()
-{
-	return $this->BelongsTo('Category', 'cate_id')->bind('cate_name');
+// 品牌模型中
+class Brand extends Model{
+  public function category()
+  {
+    // 品牌一方:belongsTo是反向关联到多方:分类表即主表
+    // 默认是在brand表查询时中新增个category字段,字段值包含完整的分类记录,要是使用bind字段,直接就绑定到一维结果里,不会有category字段嵌套
+    return $this->BelongsTo('Category', 'cate_id')->bind('cate_name');
+  }
 }
+
+// 当你查询品牌（Brand）时，通过关联自动把分类（Category）的某些字段（如 cate_name）也加载进来，并可以直接通过品牌对象访问这些字段，就像它们是品牌自己的字段一样,用于扁平化关联查询
 ```
 
 控制器中

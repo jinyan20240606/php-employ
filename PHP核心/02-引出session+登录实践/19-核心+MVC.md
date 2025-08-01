@@ -6,6 +6,7 @@ typora-copy-images-to: images
 - [1.2  Session（会话）](#12--session会话)
     - [1.2.1  原理](#121--原理)
     - [1.2.2  session操作](#122--session操作)
+      - [session\_start内部逻辑](#session_start内部逻辑)
     - [1.2.3  与会话有关的配置](#123--与会话有关的配置)
     - [1.2.4  销毁会话](#124--销毁会话)
     - [1.2.5  垃圾回收](#125--垃圾回收)
@@ -90,6 +91,19 @@ session_start()作用
 1、没有会话空间就创建一个空间
 2、有会话空间就打开空间
 ```
+
+##### session_start内部逻辑
+
+1. 当你调用 session_start()：
+   1. PHP 检查请求头中是否有 Cookie: PHPSESSID=xxx
+      1. 有 → 读取服务器上对应的 session 文件（如 sess_xxx）
+      2. 无 → 创建一个新的 session_id
+   2. PHP 自动设置响应头：`Set-Cookie: PHPSESSID=abc123; path=/; HttpOnly; Secure; SameSite=Lax`
+   3. 将 session 数据加载到 $_SESSION 超全局变量
+   4. 你可以通过 $_SESSION['key'] = value 读写数据
+2. 刷新页面会话id是不变的，当cookie失效会再次变的
+   1. 正常情况下，仅仅刷新页面不会导致会话ID的变化。只有在特定条件下，如会话过期、会话被手动销毁或是改变了会话管理的相关配置等情况下，才会产生新的会话ID
+   2. 只要你下一次不发送会话id,就会重新创建个新空间.之前的就失效了
 
 **注意：**
 
