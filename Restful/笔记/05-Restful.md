@@ -255,13 +255,15 @@ RESTFul风格的数据接口示例：
 
 以新闻资源为例：URI及HTTP动词设计如下
 
-| HTTP动词 | URI路径              | 说明               |
-| -------- | -------------------- | ------------------ |
-| GET      | http://域名/news     | 获取列表数据       |
-| GET      | http://域名/news/:id | 根据id获取一条数据 |
-| POST     | http://域名/news     | 添加一条数据       |
-| PUT      | http://域名/news/:id | 根据id修改一条数据 |
-| DELETE   | http://域名/news/:id | 根据id删除一条数据 |
+（对于资源, 常用一般有4个操作5个方法, CURD(增/删/改/查1查多)）
+
+| HTTP动词 | URI路径              | 说明               | 控制器对应方法|
+| -------- | -------------------- | ------------------ | ------------- |
+| GET      | http://域名/news     | 获取列表数据       | index         |
+| GET      | http://域名/news/:id | 根据id获取一条数据 | read          |
+| POST     | http://域名/news     | 添加一条数据       | save          |
+| PUT      | http://域名/news/:id | 根据id修改一条数据 | update        |
+| DELETE   | http://域名/news/:id | 根据id删除一条数据 | delete        |
 
 #  三、RestFul实战
 
@@ -307,13 +309,13 @@ php think make:controller api/News
 
 | **标识** | **请求类型** | **生成路由规则** | **对应操作方法（默认）** |
 | -------- | ------------ | ---------------- | ------------------------ |
-| index    | GET          | news             | index                    |
+| index    | GET          | news             | index（保留）                    |
 | create   | GET          | news/create      | create                   |
-| save     | POST         | news             | save                     |
-| read     | GET          | news/:id         | read                     |
+| save     | POST         | news             | save（保留）                     |
+| read     | GET          | news/:id         | read（保留）                     |
 | edit     | GET          | news/:id/edit    | edit                     |
-| update   | PUT          | news/:id         | update                   |
-| delete   | DELETE       | news/:id         | delete                   |
+| update   | PUT          | news/:id         | update（保留）                   |
+| delete   | DELETE       | news/:id         | delete（保留）                   |
 
 ④修改News控制器，返回json格式数据
 
