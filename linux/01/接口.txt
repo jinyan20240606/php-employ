@@ -1,0 +1,3 @@
+IP½Ó¿Ú
+https://api.i-lynn.cn/ip
+https://api.i-lynn.cn/ip?query=8.8.8.8&format=json
