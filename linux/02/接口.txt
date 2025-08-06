@@ -1,9 +1,0 @@
-全国高校查询
-https://api.i-lynn.cn/college?page=3
-
-
-高校专业查询
-https://api.i-lynn.cn/major
-
-坐标转实际地址
-https://api.i-lynn.cn/poi?location=116.68551911328123,37.53635263563414
