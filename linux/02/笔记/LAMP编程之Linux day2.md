@@ -7,6 +7,7 @@
   - [**3、free指令**](#3free指令)
   - [**4、find指令（特例）**](#4find指令特例)
   - [**5、ps指令（重点）**](#5ps指令重点)
+  - [**5、pkill指令**](#5pkill指令)
   - [**6、service指令**](#6service指令)
   - [**6、Systemctl语法：**](#6systemctl语法)
   - [**7、grep指令（重点）**](#7grep指令重点)
@@ -150,6 +151,12 @@
 操作效果：
 
 ![](Aspose.Words.aad05c91-0c3e-4b01-bc55-db0828de52d5.006.png)
+
+## **5、pkill指令**
+
+`pkill`：是一个通过 进程名 或 其他属性 来发送信号（默认是 SIGTERM）从而终止进程的命令
+
+`pkill php` 会杀死所有进程名中包含 php 的进程
 
 **UID：该进程的启动用户名；**
 

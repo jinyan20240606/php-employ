@@ -449,7 +449,7 @@ CentOS-6.6-i386-bin-DVD1.iso：镜像文件，也就是Linux的安装包
 
 /sbin：sbin表示super bin（shell bin），里面同样也类似于bin目录，也存放了一些二进制文件，只不过这些命令只能是让超级管理员去运行。
 
-**/usr：存放着一些用户自己安装的软件，其实类似于windows下的Program Files目录。**
+**/usr：存放着一些用户自己下载安装，上传的软件，其实类似于windows下的Program Files目录。**
 
 **/var：（variable可变的文件）存放着Linux下的一些日志文件，在实际开发的时候有一些公司也习惯把Apache或者nginx的站点目录也会放到这个目录中。**
 
