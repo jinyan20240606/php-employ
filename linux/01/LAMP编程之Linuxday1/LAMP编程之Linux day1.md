@@ -268,6 +268,8 @@ CentOS-6.6-i386-bin-DVD1.iso：镜像文件，也就是Linux的安装包
 
 **第九步：选择网络类型，选择【NAT】，然后点击【下一步】**
 
+1. 网络类型详解：https://blog.csdn.net/weixin_45178128/article/details/147463488
+
 ![](Aspose.Words.158110b7-39db-4b1f-b578-40245175baef.022.png)
 
 **第十步：选择I/O控制器类型，默认即可，点击【下一步】**
