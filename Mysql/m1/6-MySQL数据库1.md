@@ -13,6 +13,7 @@ typora-copy-images-to: images
     - [1.3.2  通过web窗体连接](#132--通过web窗体连接)
     - [1.3.3  命令行连接](#133--命令行连接)
     - [1.3.4  退出登录](#134--退出登录)
+    - [1.3.5  mysql服务器不同启动方式](#135--mysql服务器不同启动方式)
 - [1.4  数据库基本概念](#14--数据库基本概念)
     - [1.4.1  数据库、表相关](#141--数据库表相关)
     - [1.4.2  数据相关](#142--数据相关)
@@ -210,7 +211,61 @@ mysql> quit		-- 方法二
 mysql> \q		-- 方法三
 ```
 
+#### 1.3.5  mysql服务器不同启动方式
 
+一、Windows 系统启动 MySQL 服务
+Windows 中 MySQL 服务通常以系统服务的形式存在，常见启动方式有两种：
+1. 命令行启动（推荐，需以管理员身份运行 CMD 或 PowerShell）
+```js
+bash
+# 启动 MySQL 服务（服务名通常为 MySQL 或 MySQLX.X，X.X 为版本号）
+net start MySQL
+
+# 示例：若服务名为 MySQL80（常见于 MySQL 8.0 版本）
+net start MySQL80
+```
+2. 通过服务管理器启动
+按下 Win + R，输入 services.msc 打开服务窗口
+在列表中找到 MySQL 相关服务（如 MySQL、MySQL80）
+右键选择「启动」
+
+二、Linux 系统启动 MySQL 服务
+Linux 主要通过系统服务管理工具（如 systemctl 或 service）启动，取决于系统版本：
+
+1. 使用 systemctl 命令（适用于 CentOS 7+/Ubuntu 16.04+ 等）
+```js
+# 启动 MySQL 服务
+sudo systemctl start mysqld  # 服务名通常为 mysqld 或 mysql
+
+# 示例：部分系统服务名为 mysql
+sudo systemctl start mysql
+```
+2. 使用 service 命令（适用于 CentOS 6 或旧版 Ubuntu）
+```js
+# 启动 MySQL 服务
+sudo service mysqld start
+
+# 或
+sudo service mysql start
+```
+
+3. 直接运行可执行文件（临时启动，不推荐生产环境）
+```js
+# 进入 MySQL 的 bin 目录（路径需根据实际安装位置调整）
+cd /usr/local/mysql/bin/
+
+# 启动服务（前台运行，关闭终端则停止）
+./mysqld
+
+# 后台运行（加 & 符号）
+./mysqld &
+```
+
+**注意**
+- 服务名可能因安装版本或方式略有差异（如 mysqld、mysql、MySQL80 等），可通过查看服务列表确认：
+  - Windows：sc query | findstr MySQL
+  - Linux：systemctl list-unit-files | grep mysql
+- 生产环境中推荐使用系统服务工具（net/systemctl）管理，确保服务稳定性和自动启动
 
 ## 1.4  数据库基本概念
 
