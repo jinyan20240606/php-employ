@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- 加载logback基础的日志文件配置，在这个日志文件中定义了控制台输出源，以及日志输出格式 -->
+    <include resource="org/springframework/boot/logging/logback/base.xml" />
+
+    <!--定义日志级别-->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+
+</configuration>
