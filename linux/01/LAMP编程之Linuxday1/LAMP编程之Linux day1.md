@@ -10,7 +10,8 @@
     - [**3.2、开源文化**](#32开源文化)
     - [**3.3、Linux分支**](#33linux分支)
 - [**二、Linux安装**](#二linux安装)
-  - [**1、安装虚拟环境**](#1安装虚拟环境)
+  - [**1、安装虚拟机环境**](#1安装虚拟机环境)
+    - [实操补充](#实操补充)
   - [**2、Linux安装**](#2linux安装)
 - [**三、Linux目录介绍**](#三linux目录介绍)
 - [**四、命令行(shell，壳)**](#四命令行shell壳)
@@ -158,7 +159,7 @@ Linux是**开源**的操作系统。所谓开源就是指开放源代码。
 1、centos镜像版本介绍参考：https://cloud.tencent.com/developer/article/2038139
 
 **虚拟环境安装：是指通过一些特殊的软件虚拟出一个安装环境，然后在安装环境中进行安装**；（虚拟机≠虚拟主机）
-## **1、安装虚拟环境**
+## **1、安装虚拟机环境**
 虚拟环境可以通过特殊的软件来实现：**VMare Wrokstation（墙裂推荐）**、Virtual Box等。
 
 ![](Aspose.Words.158110b7-39db-4b1f-b578-40245175baef.002.png)
@@ -215,6 +216,13 @@ CentOS-6.6-i386-bin-DVD1.iso：镜像文件，也就是Linux的安装包
 安装完成之后打开软件会看到下面的界面：
 
 ![](Aspose.Words.158110b7-39db-4b1f-b578-40245175baef.013.png)
+
+### 实操补充
+
+1. 虚拟机安装学习，下载地址：https://www.cnblogs.com/joyware/p/18202259
+   1. 安装后可能网络设备没有显示虚拟网卡解决参考：https://blog.csdn.net/Excelsior_Dmu/article/details/131425102
+   2. 参考https://blog.csdn.net/huangjinao/article/details/102654045
+
 ## **2、Linux安装**
 1、创建新的虚拟机
 
