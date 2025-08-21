@@ -222,6 +222,8 @@ CentOS-6.6-i386-bin-DVD1.iso：镜像文件，也就是Linux的安装包
 1. 虚拟机安装学习，下载地址：https://www.cnblogs.com/joyware/p/18202259
    1. 安装后可能网络设备没有显示虚拟网卡解决参考：https://blog.csdn.net/Excelsior_Dmu/article/details/131425102
    2. 参考https://blog.csdn.net/huangjinao/article/details/102654045
+   3. 虚拟网络设备正常显示后，就可以在真实主机中用ssh链接了
+      1. win11查看网络设备方式：开始菜单搜索框中搜索设备管理器--->网络适配器
 
 ## **2、Linux安装**
 1、创建新的虚拟机
