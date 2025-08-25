@@ -1096,6 +1096,8 @@ Userdel：user delete（用户删除）
 
 `	`**语法：#chown  [-R]  username:groupname   文档路径**
 
+-R是递归
+
 案例：将刚才oo的文档的所属组所属用户修改为root
 
 #chown -R root:root /oo
