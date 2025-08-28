@@ -1,0 +1,2 @@
+1.docker load -i nacos.tar 导入镜像
+2.docker run --env MODE=standalone --name nacos -d -p 58848:8848 nacos/nacos-server:1.4.1
